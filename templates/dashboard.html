@@ -1,0 +1,26 @@
+{% block title %}
+    Sign Up
+{% endblock %}
+
+{% block main %}
+<br>
+<form action="/signup" method="post">
+    <div class="form-group">
+        <b>Name</b> <input autocomplete="off" autofocus name="Name" id="name" type="text" required>
+        <br>
+        <b>Date of Birth</b> <input autocomplete="off" autofocus name="Date of Birth" id="dateOfBirth" type="date" required>
+        <br>
+        <b>Height</b> <input autocomplete="off" autofocus name="Height" id="heighFt" type="number" required> <b>ft</b> 
+        <input autocomplete="off" autofocus name="Height" id="heightIn" type="number" required> <b>in</b>
+        <br>
+        <b>Weight</b> <input autocomplete="off" autofocus name="Weight" id="weight" type="number" required>
+        <b>Sex</b>
+        <select name="sex" id="sex">
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+        </select>
+        <br>
+        <button type="submit" class="btn btn-primary">Sign Up</button>
+    </div>
+</form>
+{% endblock %}

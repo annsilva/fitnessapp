@@ -20,12 +20,12 @@ def signupPage():
 @app.route("/signup", methods=["POST"])
 def signup():
     # Get details from user
-    name = request.form.get("name")
-    dob = request.form.get("dateOfBirth")
-    heightFt = request.form.get("heightFt")
-    heightIn = request.form.get("heightIn")
-    weight = request.form.get("weight")
-    sex = request.form.get("sex")
+    name = request.form.get("Name")
+    dob = request.form.get("Date of Birth")
+    heightFt = request.form.get("HeightFt")
+    heightIn = request.form.get("HeightIn")
+    weight = request.form.get("Weight")
+    sex = request.form.get("Sex")
 
     # Create empty Python dictionary to hold users report submitted by form
     user_login = {}
@@ -44,11 +44,11 @@ def signup():
 
     return render_template("login.html")
 
-@app.route("/dashboard", methods=["GET"])
-def dashboard():
+@app.route("/login", methods=["POST"])
+def login():
     # Check if the user is logged in or exists in the database
-    name = request.form.get("name")
-    dob = request.form.get("dateOfBirth")
+    name = request.form.get("Name")
+    dob = request.form.get("Date of Birth")
     currentUser = users.find_one({"name": name, "dateOfBirth": dob})
 
     if not currentUser:

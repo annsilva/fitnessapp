@@ -9,18 +9,21 @@ client = MongoClient('mongodb+srv://ann:root@fitnesscluster.jgxt2re.mongodb.net/
 fitness_db = client.fitness
 users = fitness_db.users
 
-@app.route("/")
-def home():                                                                
-    return render_template("/dashboard.html")
+@app.route('/')
+def home():
+    return render_template("/login.html")
 
+@app.route("/signupPage")
+def signupPage():
+    return render_template("/signup.html")
 
 @app.route("/signup", methods=["POST"])
 def signup():
     # Get details from user
     name = request.form.get("name")
     dob = request.form.get("dateOfBirth")
-    heightFt = request.form.get("heighFt")    
-    heightIn = request.form.get("heighIn")
+    heightFt = request.form.get("heightFt")
+    heightIn = request.form.get("heightIn")
     weight = request.form.get("weight")
     sex = request.form.get("sex")
 
@@ -39,7 +42,7 @@ def signup():
     # Add users into the mongoDB
     users.insert_one(user_login)
 
-    return render_template("/dashboard.html")
+    return render_template("login.html")
 
 @app.route("/dashboard", methods=["GET"])
 def dashboard():
@@ -53,7 +56,7 @@ def dashboard():
         return redirect(url_for("home"))
 
     # If the user is logged in, render the dashboard page and pass the username as a parameter
-    return render_template("dashboard.html", username=name)
+    return render_template("/dashboard.html", username=name)
 
 if __name__ == "__main__":
     app.run()

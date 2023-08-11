@@ -30,12 +30,12 @@
             <div class="card">
                 {% block title %}
                 <div><h5 class="card-header">Dashboard</h5></div>
-                <div><h5 class="card-header">{{ username }}</h5></div>
+                <div><h5 class="card-header">Hello {{ username }}!</h5></div>
                 <div class="page-breadcrumb">
                         <div>
                             <nav aria-label="breadcrumb">
                                 <ol class="breadcrumb">
-                                    <li>fsfdvfdsbdfbsfdsb</li><li class="breadcrumb-item"><a href="#" class="breadcrumb-link">Dashboard</a></li>                            
+                                    <li class="breadcrumb-item"><a href="#" class="breadcrumb-link">Dashboard</a></li>                            
                                     <li class="breadcrumb-item active" aria-current="page" ><a href="{{ url_for('activities') }}" class="breadcrumb-link">Log Activity</a></li>
                                     <li class="breadcrumb-item active" aria-current="page" ><a href="{{ url_for('weight') }}" class="breadcrumb-link">Log Weight</a></li>
                                     <li class="breadcrumb-item active" aria-current="page" ><a href="{{ url_for('sleep') }}" class="breadcrumb-link">Log Sleep</a></li>  

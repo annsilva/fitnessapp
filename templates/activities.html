@@ -29,8 +29,21 @@
         <div class="row">
             <div class="card">
                 {% block title %}
-                <h5 class="card-header">Sign Up</h5>
-                {% endblock %}                
+                <div><h5 class="card-header">Activities</h5></div>
+                <div><h5 class="card-header">{{ name }}</h5></div>
+                <div class="page-breadcrumb">
+                        <div>
+                            <nav aria-label="breadcrumb">
+                                <ol class="breadcrumb">
+                                    <li>fsfdvfdsbdfbsfdsb</li><li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" class="breadcrumb-link">Dashboard</a></li>                            
+                                    <li class="breadcrumb-item active" aria-current="page" ><a href="#" class="breadcrumb-link">Log Activity</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page" ><a href="{{ url_for('weight') }}" class="breadcrumb-link">Log Weight</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page" ><a href="{{ url_for('sleep') }}" class="breadcrumb-link">Log Sleep</a></li>  
+                                </ol>
+                            </nav>  
+                    </div> 
+                </div>         
+                {% endblock %}               
                 <div class="card-body">
                     {% block main %}
                     <form action="/activities" method="post">                    

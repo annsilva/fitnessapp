@@ -1,6 +1,10 @@
 from flask import Flask, render_template, request, flash, redirect, url_for, session
 from pymongo import MongoClient
+from bson import ObjectId
 from datetime import datetime
+import matplotlib.pyplot as plt
+import io
+import base64
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 app.debug = True
@@ -9,6 +13,7 @@ app.secret_key = 'dggsfvdsfgrhsdgsdfsfsg'
 client = MongoClient('mongodb+srv://ann:root@fitnesscluster.jgxt2re.mongodb.net/')
 fitness_db = client.fitness
 users = fitness_db.users
+
 
 @app.route('/')
 def home():
@@ -43,7 +48,7 @@ def signup():
 
     return render_template("login.html")
 
-@app.route("/login", methods=["POST"])
+@app.route("/login", methods=["POST", "GET"])
 def login():
     # Check if the session user is logged in or exists in the database TODO
     # In this code snippet, `name` and `dob` are variables that are used to retrieve the values
@@ -56,18 +61,35 @@ def login():
         flash("Invalid username and date of birth. Please sign up")
         # If the user is not logged in, redirect to the login page
         return redirect(url_for("signup"))
-    
-    # Set user information in session
-    session["username"] = name
-    session["dob"] = dob
+    else:
+        # Set user information in session
+        session["name"] = name
+        session["dob"] = dob
+        
+        pipeline = [{'$match': {'name': name}},
+                    {'$unwind': '$activities'},
+                    {'$sort': {'activities.activityDate': -1}},
+                    {'$limit': 1}]
+        result = list(users.aggregate(pipeline))
+        
+        if result:
+            latest_activity = result[0]['activities']
+            activity_type = latest_activity['activityType']
+            activity_date = latest_activity['activityDate']
+            duration = latest_activity['activityDate']
+            recentActivity =(f"{activity_type}")
+        else:
+            recentActivity =("No activity.")  
 
-    # If the user is logged in, render the dashboard page and pass the username as a parameter
-    return render_template("/dashboard.html", username=name)
-    # In this code, `username` is a variable that is used to
-    # store the name of the user who is currently logged in.
-    # It is used to display the username on the dashboard
-    # page and to retrieve and update user-specific data
-    # from the database.
+        # If the user is logged in, render the dashboard page and pass the username as a parameter
+        return render_template("/dashboard.html", name=name, recentActivity=recentActivity) 
+        # In this code, `username` is a variable that is used to
+        # store the name of the user who is currently logged in.
+        # It is used to display the username on the dashboard
+        # page and to retrieve and update user-specific data
+        # from the database.
+    
+  
 
 @app.route("/activities", methods=["POST", "GET"])
 def activities():
@@ -75,7 +97,7 @@ def activities():
         return render_template("/activities.html")
     
     # Access user information from session
-    name = session.get("username")
+    name = session.get("name")
     dob = session.get("dob")
     
 
@@ -92,7 +114,7 @@ def activities():
     # Insert the activity into the activities sub-document of the user's record
     users.update_one({"name": name, "dateOfBirth": dob}, {"$push": {"activities": activity}})
 
-    return render_template("dashboard.html")
+    return render_template("/dashboard.html", name=name)
 
 @app.route("/weight", methods=["POST", "GET"])
 def weight():
@@ -100,7 +122,7 @@ def weight():
         return render_template("/weight.html")
     
     # Access user information from session
-    name = session.get("username")
+    name = session.get("name")
     dob = session.get("dob")
     
     if name is None or dob is None:
@@ -113,7 +135,7 @@ def weight():
 
     users.update_one({"name": name, "dateOfBirth": dob}, {"$push": {"weightReport": weightReport}})
 
-    return render_template("dashboard.html")
+    return render_template("/dashboard.html", name=name)
 
 @app.route("/sleep", methods=["POST", "GET"])
 def sleep():
@@ -121,7 +143,7 @@ def sleep():
         return render_template("/sleep.html")
     
     # Access user information from session
-    name = session.get("username")
+    name = session.get("name")
     dob = session.get("dob")
     
     if name is None or dob is None:
@@ -134,25 +156,50 @@ def sleep():
 
     users.update_one({"name": name, "dateOfBirth": dob}, {"$push": {"sleepReport": sleepReport}})
 
-    return render_template("dashboard.html")
+    return render_template("/dashboard.html", name=name)
 
 @app.route("/dashboard", methods=["POST", "GET"])
 def dashboard():
     if request.method == "GET":
-        return render_template("/dashboard.html")
-    
-    # Access user information from session
-    name = session.get("username")
-    dob = session.get("dob")    
+       return render_template("/dashboard.html") 
+    #get RecentActivities
+    pipeline = [{'$match': {'name': name}},
+                    {'$unwind': '$activities'},
+                    {'$sort': {'activities.activityDate': -1}},
+                    {'$limit': 1}]
+    result = list(users.aggregate(pipeline))
+
+    if result:
+        latest_activity = result[0]['activities']
+        activity_type = latest_activity['activityType']
+        activity_date = latest_activity['activityDate']
+        recentActivity =(f"{activity_type}<br/>{activity_date}")
+    else:
+        recentActivity =("No activity.")  
+            
+        # Access user information from session
+        name = session.get("name")
+        dob = session.get("dob") 
     
     if name is None or dob is None:
         # Handle the case where session data is missing
         return redirect(url_for("login"))
     
-    #get RecentActivities
-    currentActivity = users.find_one({"name": name, "dateOfBirth": dob})
+    # Create a sample graph using matplotlib
+    x = [1, 2, 3, 4, 5]
+    y = [10, 15, 7, 12, 5]
+    plt.plot(x, y)
+    plt.xlabel('X values')
+    plt.ylabel('Y values')
+    plt.title('Sample Graph')
+
+    # Save the graph to a BytesIO object
+    img = io.BytesIO()
+    plt.savefig(img, format='png')
+    img.seek(0)
+    graph_url = base64.b64encode(img.getvalue()).decode()
     
-    return render_template("dashboard.html")
+    return render_template("/dashboard.html", name=name, recentActivity=recentActivity)
 
 if __name__ == "__main__":
     app.run()

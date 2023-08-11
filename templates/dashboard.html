@@ -30,12 +30,12 @@
             <div class="card">
                 {% block title %}
                 <div><h5 class="card-header">Dashboard</h5></div>
-                <div><h5 class="card-header">{{ username }}</h5></div>
+                <div><h5 class="card-header">{{ name }}</h5></div>
                 <div class="page-breadcrumb">
                         <div>
                             <nav aria-label="breadcrumb">
                                 <ol class="breadcrumb">
-                                    <li>fsfdvfdsbdfbsfdsb</li><li class="breadcrumb-item"><a href="#" class="breadcrumb-link">Dashboard</a></li>                            
+                                    <li class="breadcrumb-item"><a href="#" class="breadcrumb-link">Dashboard</a></li>                            
                                     <li class="breadcrumb-item active" aria-current="page" ><a href="{{ url_for('activities') }}" class="breadcrumb-link">Log Activity</a></li>
                                     <li class="breadcrumb-item active" aria-current="page" ><a href="{{ url_for('weight') }}" class="breadcrumb-link">Log Weight</a></li>
                                     <li class="breadcrumb-item active" aria-current="page" ><a href="{{ url_for('sleep') }}" class="breadcrumb-link">Log Sleep</a></li>  
@@ -53,7 +53,7 @@
                                     <h5 class="card-header">Recent Activity</h5>
                                     <div class="card-body">
                                         <div class="metric-value d-inline-block">
-                                            <h1 class="mb-1">{{ recentactivity }}</h1>
+                                            <h5 class="mb-1">{{ recentActivity }}</h5>
                                             <img src="{{ url_for('static', filename='images/run.png') }}" />
                                         </div>
                                         <div class="metric-label d-inline-block float-right text-success font-weight-bold">
@@ -64,7 +64,7 @@
                                         <div id="sparkline-revenue"></div>
                                     </div>
                                     <div class="card-footer text-center bg-white">
-                                        <a href="#" class="card-link">View Details</a>
+                                        <img src="data:image/png;base64,{{ graph_url }}" alt="Sample Graph">
                                     </div>
                                 </div>
                             </div>

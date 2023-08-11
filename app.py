@@ -29,7 +29,6 @@ def signup():
 
     # Create empty Python dictionary to hold users report submitted by form
     user_login = {}
-
     # Compile details into Python dictionary
     user_login["name"] = name
     user_login["dateOfBirth"] = dob
@@ -47,6 +46,8 @@ def signup():
 @app.route("/login", methods=["POST"])
 def login():
     # Check if the session user is logged in or exists in the database TODO
+    # In this code snippet, `name` and `dob` are variables that are used to retrieve the values
+    # entered by the user in the login form.
     name = request.form.get("Name")
     dob = request.form.get("Date of Birth")
     currentUser = users.find_one({"name": name, "dateOfBirth": dob})
@@ -62,6 +63,11 @@ def login():
 
     # If the user is logged in, render the dashboard page and pass the username as a parameter
     return render_template("/dashboard.html", username=name)
+    # In this code, `username` is a variable that is used to
+    # store the name of the user who is currently logged in.
+    # It is used to display the username on the dashboard
+    # page and to retrieve and update user-specific data
+    # from the database.
 
 @app.route("/activities", methods=["POST", "GET"])
 def activities():
@@ -71,6 +77,7 @@ def activities():
     # Access user information from session
     name = session.get("username")
     dob = session.get("dob")
+    
 
     if name is None or dob is None:
         # Handle the case where session data is missing
@@ -79,13 +86,13 @@ def activities():
     activity = {}
     activity["activityType"] = request.form.get("Activity")
     activity["activityDate"] = request.form.get("Date")
-    activity["startTime"] = request.form.get("startTime")
-    activity["endTime"] = request.form.get("endTime")
+    activity["startTime"] = request.form.get("StartTime")
+    activity["endTime"] = request.form.get("EndTime")
 
     # Insert the activity into the activities sub-document of the user's record
     users.update_one({"name": name, "dateOfBirth": dob}, {"$push": {"activities": activity}})
 
-    return render_template("activity_success.html")
+    return render_template("dashboard.html")
 
 @app.route("/weight", methods=["POST", "GET"])
 def weight():
@@ -127,6 +134,24 @@ def sleep():
 
     users.update_one({"name": name, "dateOfBirth": dob}, {"$push": {"sleepReport": sleepReport}})
 
+    return render_template("dashboard.html")
+
+@app.route("/dashboard", methods=["POST", "GET"])
+def dashboard():
+    if request.method == "GET":
+        return render_template("/dashboard.html")
+    
+    # Access user information from session
+    name = session.get("username")
+    dob = session.get("dob")    
+    
+    if name is None or dob is None:
+        # Handle the case where session data is missing
+        return redirect(url_for("login"))
+    
+    #get RecentActivities
+    currentActivity = users.find_one({"name": name, "dateOfBirth": dob})
+    
     return render_template("dashboard.html")
 
 if __name__ == "__main__":

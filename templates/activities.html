@@ -1,20 +1,93 @@
-{% block title %}
-    Activities
-{% endblock %}
+<!DOCTYPE html>
+<html>
+<head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>Fitness</title>
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/fonts/circular-std/style.css') }}" >
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='libs/css/style.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/fonts/fontawesome/css/fontawesome-all.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/datepicker/tempusdominus-bootstrap-4.css') }}" />
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/inputmask/css/inputmask.css') }}" />
+</head>
+<body>
+    <!-- Placeholders for the header and footer content -->
+    <div id="header-placeholder"></div>
 
-
-{% block main %}
-<form action="/activities" method="post">
-    <div class="form-group">
-        <b>Activity</b> <input autocomplete="off" autofocus name="Activity" type="text" required>
-        <br>
-        <b>Date</b> <input autocomplete="off" autofocus name="Date" type="date" required>
-        <br>
-        <b>Start Time</b> <input autocomplete="off" autofocus name="StartTime" type="time" required>
-        <br>
-        <b>End Time</b> <input autocomplete="off" autofocus name="StartTime" type="time" required>
-        <br>
-        <input type="submit" class="btn btn-primary"></input>
+    <!-- Main content of the inner page -->
+    <div id="content" class="dashboard-wrapper">
+        <div class="row">
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                <div class="page-header" id="top">
+                    <h2 class="pageheader-title">Fitness App</h2>
+                </div>
+            </div>
+        </div>        
+        <div class="row">
+            <div class="card">
+                {% block title %}
+                <h5 class="card-header">Sign Up</h5>
+                {% endblock %}                
+                <div class="card-body">
+                    {% block main %}
+                    <form action="/activities" method="post">                    
+                            <div class="form-group">
+                                <label for="inputText3" class="col-form-label">Activity</label>
+                                <input autocomplete="off" autofocus name="Activity" id="activity" type="text" required class="form-control">                
+                            </div>
+                            <div class="form-group">
+                                <label>Date</label>
+                                <input class="form-control date-inputmask"  autocomplete="off" autofocus name="Date" id="date" type="date" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="inputText3" class="col-form-label">Start Time</label>
+                                <input autocomplete="off" autofocus name="StartTime" id="starttime" type="time" required class=".form-control-custom">
+                            </div>
+                            <div class="form-group">
+                                <label for="inputText3" class="col-form-label">End Date</label>
+                                <input autocomplete="off" autofocus name="EndTime" id="endtime" type="time" required class=".form-control-custom">
+                            </div>
+                            <div class="form-group">                               
+                                <div class="col-sm-6 pl-0">
+                                    <p class="text-right">
+                                        <button type="submit" class="btn btn-space btn-primary">Log</button>
+                                        <button id="dashboard" class="btn btn-space btn-secondary">Cancel</button>
+                                    </p>
+                                </div>
+                            </div>
+                    </form>
+                    {% endblock %}
+                </div>
+            </div>
     </div>
-</form>
-{% endblock %}
+    </div>
+
+    <div id="footer-placeholder"></div>
+
+    <script>
+        // Function to load and insert the HTML content
+        function loadHTML(url, targetId) {
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    document.getElementById(targetId).innerHTML = xhr.responseText;
+                }
+            };
+            xhr.open('GET', url, true);
+            xhr.send();
+        }
+
+        // Call the function to load and insert the header and footer
+        loadHTML('header.html', 'header-placeholder');
+        loadHTML('footer.html', 'footer-placeholder');
+
+        document.getElementById('home').addEventListener('click', function() {
+            window.location.href = "{{ url_for('home') }}";
+        });
+    </script>
+</body>
+</html>
+

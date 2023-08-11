@@ -47,9 +47,7 @@
                                 <button type="submit" class="btn btn-primary">Login</button>
                             </div>
                             <div class="form-group">
-                                No account yet?  <a href="{{ url_for('signup') }}">Sign Up</a>
-                            <button id="signup" class="btn btn-space btn-secondary">Sign Up</button>
-                        
+                                No account yet?  <a href="{{ url_for('signup') }}">Sign Up</a>                        
                     </form>
                     {% endblock %}
                 </div>
@@ -75,10 +73,6 @@
         // Call the function to load and insert the header and footer
         loadHTML('header.html', 'header-placeholder');
         loadHTML('footer.html', 'footer-placeholder');
-
-        document.getElementById('signup').addEventListener('click', function() {
-            window.location.href = "{{ url_for('signup') }}";
-        });
     </script>
 </body>
 </html>

@@ -1,11 +1,140 @@
-{% block title %}
-    dashboard
-{% endblock %}
+<!DOCTYPE html>
+<html>
+<head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>Fitness</title>
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/fonts/circular-std/style.css') }}" >
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='libs/css/style.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/fonts/fontawesome/css/fontawesome-all.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/datepicker/tempusdominus-bootstrap-4.css') }}" />
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/inputmask/css/inputmask.css') }}" />
+</head>
+<body>
+    <!-- Placeholders for the header and footer content -->
+    <div id="header-placeholder"></div>
 
-<form action="/dashboard" method="post">
-    <a href="{{ url_for('activities') }}">Log Activity</a>
-    <br>
-    <a href="{{ url_for('weight') }}">Log Weight</a>
-    <br>
-    <a href="{{ url_for('sleep') }}">Log Sleep</a>
-</form>
+    <!-- Main content of the inner page -->
+    <div id="content" class="dashboard-wrapper">
+        <div class="row">
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                <div class="page-header" id="top">
+                    <h2 class="pageheader-title">Fitness App</h2>
+                </div>
+            </div>
+        </div>        
+        <div class="row">
+            <div class="card">
+                {% block title %}
+                <div><h5 class="card-header">Dashboard</h5></div>
+                <div><h5 class="card-header">{{ username }}</h5></div>
+                <div class="page-breadcrumb">
+                        <div>
+                            <nav aria-label="breadcrumb">
+                                <ol class="breadcrumb">
+                                    <li>fsfdvfdsbdfbsfdsb</li><li class="breadcrumb-item"><a href="#" class="breadcrumb-link">Dashboard</a></li>                            
+                                    <li class="breadcrumb-item active" aria-current="page" ><a href="{{ url_for('activities') }}" class="breadcrumb-link">Log Activity</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page" ><a href="{{ url_for('weight') }}" class="breadcrumb-link">Log Weight</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page" ><a href="{{ url_for('sleep') }}" class="breadcrumb-link">Log Sleep</a></li>  
+                                </ol>
+                            </nav>  
+                    </div> 
+                </div>         
+                {% endblock %}       
+                <div class="card-body">
+                    {% block main %}
+                    <form action="/dashboard" method="post">
+                        <div class="row">
+                            <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-12">
+                                <div class="card">
+                                    <h5 class="card-header">Recent Activity</h5>
+                                    <div class="card-body">
+                                        <div class="metric-value d-inline-block">
+                                            <h1 class="mb-1">{{ recentactivity }}</h1>
+                                            <img src="{{ url_for('static', filename='images/run.png') }}" />
+                                        </div>
+                                        <div class="metric-label d-inline-block float-right text-success font-weight-bold">
+                                            <span class="icon-circle-small icon-box-xs text-success bg-success-light"><i class="fa fa-fw fa-arrow-up"></i></span><span class="ml-1">25%</span>
+                                        </div>
+                                    </div>
+                                    <div class="card-body bg-light p-t-40 p-b-40">
+                                        <div id="sparkline-revenue"></div>
+                                    </div>
+                                    <div class="card-footer text-center bg-white">
+                                        <a href="#" class="card-link">View Details</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-12">
+                                <div class="card">
+                                    <h5 class="card-header">Log Weight</h5>
+                                    <div class="card-body">
+                                        <div class="metric-value d-inline-block">
+                                            <h1 class="mb-1">graph here</h1>
+                                        </div>
+                                        <div class="metric-label d-inline-block float-right text-secondary font-weight-bold">
+                                            <span class="icon-circle-small icon-box-xs text-danger bg-danger-light"><i class="fa fa-fw fa-arrow-down"></i></span><span class="ml-1">15%</span>
+                                        </div>
+                                    </div>
+                                    <div class="card-body text-center bg-light p-t-40 p-b-40">
+                                        <div id="sparkline-revenue2"></div>
+                                    </div>
+                                    <div class="card-footer text-center bg-white">
+                                        <a href="#" class="card-link">View Details</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-12">
+                                <div class="card">
+                                    <h5 class="card-header">Sleep</h5>
+                                    <div class="card-body">
+                                        <div class="metric-value d-inline-block">
+                                            <h1 class="mb-1">graph here</h1>
+                                        </div>
+                                        <div class="metric-label d-inline-block float-right text-success font-weight-bold">
+                                            <span class="icon-circle-small icon-box-xs text-success bg-success-light"><i class="fa fa-fw fa-arrow-up"></i></span><span class="ml-1">25%</span>
+                                        </div>
+                                    </div>
+                                    <div class="card-body bg-light p-t-40 p-b-40">
+                                        <div id="sparkline-revenue3"></div>
+                                    </div>
+                                    <div class="card-footer text-center bg-white">
+                                        <a href="#" class="card-link">View Details</a>
+                                    </div>
+                                </div>
+                            </div>
+                    </form>
+                    {% endblock %}
+                </div>
+            </div>
+    </div>
+    </div>
+
+    <div id="footer-placeholder"></div>
+
+    <script>
+        // Function to load and insert the HTML content
+        function loadHTML(url, targetId) {
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    document.getElementById(targetId).innerHTML = xhr.responseText;
+                }
+            };
+            xhr.open('GET', url, true);
+            xhr.send();
+        }
+
+        // Call the function to load and insert the header and footer
+        loadHTML('header.html', 'header-placeholder');
+        loadHTML('footer.html', 'footer-placeholder');
+
+        document.getElementById('signup').addEventListener('click', function() {
+            window.location.href = "{{ url_for('signup') }}";
+        });
+    </script>
+</body>
+</html>

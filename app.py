@@ -182,21 +182,72 @@ def sleep():
 
 @app.route("/dashboard", methods=["POST", "GET"])
 def dashboard():   
-    # Access user information from session
-    name = session.get("name")
-    dob = session.get("dob") 
-    
-    if name is None or dob is None:
-        # Handle the case where session data is missing
-        return redirect(url_for("login"))
-        
-    categories = ['Category 1', 'Category 2', 'Category 3', 'Category 4']
-    values = [25, 40, 30, 15]
+        # Check if the session user is logged in or exists in the database TODO
+    # In this code snippet, `name` and `dob` are variables that are used to retrieve the values
+    # entered by the user in the login form.
+    name = request.form.get("Name")
+    dob = request.form.get("Date of Birth")
+    currentUser = users.find_one({"name": name, "dateOfBirth": dob})
 
-    fig = px.bar(x=categories, y=values, labels={'x': 'Categories', 'y': 'Values'}, title='Sample Bar Graph')
-    graph_div = fig.to_html(full_html=False)
+    if not currentUser:
+        flash("Invalid username and date of birth. Please sign up")
+        # If the user is not logged in, redirect to the login page
+        return redirect(url_for("signup"))
+    else:
+        # Set user information in session
+        session["name"] = name
+        session["dob"] = dob
+        
+        pipeline = [{'$match': {'name': name}},
+                    {'$unwind': '$activities'},
+                    {'$sort': {'activities.activityDate': -1}},
+                    {'$limit': 1},
+                    {'$project': {
+                        'activityType': '$activities.activityType',
+                        'activityDate': '$activities.activityDate',
+                        'startTime': '$activities.startTime',
+                        'endTime': '$activities.endTime',
+                        'duration': {
+            '$cond': {'if': {'$and': [{'$ne': ['$activities.startTime', None]},{'$ne': ['$activities.endTime', None]}]},
+                'then': {'$subtract': [{
+                            '$dateFromString': {'dateString': {'$concat': ['$activities.activityDate','T','$activities.endTime']},
+                                'format': '%Y-%m-%dT%H:%M'}},
+                        {'$dateFromString': {'dateString': {'$concat': ['$activities.activityDate','T','$activities.startTime']},
+                                'format': '%Y-%m-%dT%H:%M'}}]},
+                'else': 0
+            }
+        }
+    }}
+]
+
+        result = list(users.aggregate(pipeline))
+        
+        if result:
+            latest_activity = result[0]
+            activity_type = latest_activity['activityType']
+            activity_date = latest_activity['activityDate']
+            duration = latest_activity['duration']    
+            duration_hours = duration // 3600000  # Convert milliseconds to hours
+            duration_minutes = (duration % 3600000) // 60000  # Convert remainder to minutes            
+            wholeduration = (f"{duration_hours} hrs {duration_minutes} mins")
+            recentActivity =(f"{activity_type}")
+        else:
+            recentActivity =("No activity.")  
+            
+        categories = ['Category 1', 'Category 2', 'Category 3', 'Category 4']
+        values = [25, 40, 30, 15]
+
+        fig = px.bar(x=categories, y=values, labels={'x': 'Categories', 'y': 'Values'}, title='Sample Bar Graph')
+        graph_div = fig.to_html(full_html=False)
+
+        # If the user is logged in, render the dashboard page and pass the username as a parameter
+        return render_template("/dashboard.html", name=name, recentActivity=recentActivity, wholeduration=wholeduration, graph_div=graph_div) 
+        # In this code, `username` is a variable that is used to
+        # store the name of the user who is currently logged in.
+        # It is used to display the username on the dashboard
+        # page and to retrieve and update user-specific data
+        # from the database.
     
-    return render_template("/dashboard.html", name=name,graph_div=graph_div)
 
 if __name__ == "__main__":
     app.run()

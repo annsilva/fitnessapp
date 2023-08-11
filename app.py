@@ -2,7 +2,8 @@ from flask import Flask, render_template, request, flash, redirect, url_for, ses
 from pymongo import MongoClient
 from datetime import datetime
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates', static_folder='static')
+app.debug = True
 app.secret_key = 'dggsfvdsfgrhsdgsdfsfsg'
 
 client = MongoClient('mongodb+srv://ann:root@fitnesscluster.jgxt2re.mongodb.net/')

@@ -5,6 +5,7 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 import io
 import base64
+import plotly.express as px
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 app.debug = True
@@ -76,41 +77,12 @@ def login():
                         'startTime': '$activities.startTime',
                         'endTime': '$activities.endTime',
                         'duration': {
-            '$cond': {
-                'if': {
-                    '$and': [
-                        {'$ne': ['$activities.startTime', None]},
-                        {'$ne': ['$activities.endTime', None]}
-                    ]
-                },
-                'then': {
-                    '$subtract': [
-                        {
-                            '$dateFromString': {
-                                'dateString': {
-                                    '$concat': [
-                                        '$activities.activityDate',
-                                        'T',
-                                        '$activities.endTime'
-                                    ]
-                                },
-                                'format': '%Y-%m-%dT%H:%M'
-                            }
-                        },
-                        {
-                            '$dateFromString': {
-                                'dateString': {
-                                    '$concat': [
-                                        '$activities.activityDate',
-                                        'T',
-                                        '$activities.startTime'
-                                    ]
-                                },
-                                'format': '%Y-%m-%dT%H:%M'
-                            }
-                        }
-                    ]
-                },
+            '$cond': {'if': {'$and': [{'$ne': ['$activities.startTime', None]},{'$ne': ['$activities.endTime', None]}]},
+                'then': {'$subtract': [{
+                            '$dateFromString': {'dateString': {'$concat': ['$activities.activityDate','T','$activities.endTime']},
+                                'format': '%Y-%m-%dT%H:%M'}},
+                        {'$dateFromString': {'dateString': {'$concat': ['$activities.activityDate','T','$activities.startTime']},
+                                'format': '%Y-%m-%dT%H:%M'}}]},
                 'else': 0
             }
         }
@@ -209,10 +181,7 @@ def sleep():
     return render_template("/dashboard.html", name=name)
 
 @app.route("/dashboard", methods=["POST", "GET"])
-def dashboard():
-    if request.method == "GET":
-       return render_template("/dashboard.html") 
-   
+def dashboard():   
     # Access user information from session
     name = session.get("name")
     dob = session.get("dob") 
@@ -220,8 +189,14 @@ def dashboard():
     if name is None or dob is None:
         # Handle the case where session data is missing
         return redirect(url_for("login"))
+        
+    categories = ['Category 1', 'Category 2', 'Category 3', 'Category 4']
+    values = [25, 40, 30, 15]
+
+    fig = px.bar(x=categories, y=values, labels={'x': 'Categories', 'y': 'Values'}, title='Sample Bar Graph')
+    graph_div = fig.to_html(full_html=False)
     
-    return render_template("/dashboard.html", name=name)
+    return render_template("/dashboard.html", name=name,graph_div=graph_div)
 
 if __name__ == "__main__":
     app.run()

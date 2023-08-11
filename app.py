@@ -69,20 +69,70 @@ def login():
         pipeline = [{'$match': {'name': name}},
                     {'$unwind': '$activities'},
                     {'$sort': {'activities.activityDate': -1}},
-                    {'$limit': 1}]
+                    {'$limit': 1},
+                    {'$project': {
+                        'activityType': '$activities.activityType',
+                        'activityDate': '$activities.activityDate',
+                        'startTime': '$activities.startTime',
+                        'endTime': '$activities.endTime',
+                        'duration': {
+            '$cond': {
+                'if': {
+                    '$and': [
+                        {'$ne': ['$activities.startTime', None]},
+                        {'$ne': ['$activities.endTime', None]}
+                    ]
+                },
+                'then': {
+                    '$subtract': [
+                        {
+                            '$dateFromString': {
+                                'dateString': {
+                                    '$concat': [
+                                        '$activities.activityDate',
+                                        'T',
+                                        '$activities.endTime'
+                                    ]
+                                },
+                                'format': '%Y-%m-%dT%H:%M'
+                            }
+                        },
+                        {
+                            '$dateFromString': {
+                                'dateString': {
+                                    '$concat': [
+                                        '$activities.activityDate',
+                                        'T',
+                                        '$activities.startTime'
+                                    ]
+                                },
+                                'format': '%Y-%m-%dT%H:%M'
+                            }
+                        }
+                    ]
+                },
+                'else': 0
+            }
+        }
+    }}
+]
+
         result = list(users.aggregate(pipeline))
         
         if result:
-            latest_activity = result[0]['activities']
+            latest_activity = result[0]
             activity_type = latest_activity['activityType']
             activity_date = latest_activity['activityDate']
-            duration = latest_activity['activityDate']
+            duration = latest_activity['duration']    
+            duration_hours = duration // 3600000  # Convert milliseconds to hours
+            duration_minutes = (duration % 3600000) // 60000  # Convert remainder to minutes            
+            wholeduration = (f"{duration_hours} hrs {duration_minutes} mins")
             recentActivity =(f"{activity_type}")
         else:
             recentActivity =("No activity.")  
 
         # If the user is logged in, render the dashboard page and pass the username as a parameter
-        return render_template("/dashboard.html", name=name, recentActivity=recentActivity) 
+        return render_template("/dashboard.html", name=name, recentActivity=recentActivity, wholeduration=wholeduration) 
         # In this code, `username` is a variable that is used to
         # store the name of the user who is currently logged in.
         # It is used to display the username on the dashboard
@@ -162,44 +212,16 @@ def sleep():
 def dashboard():
     if request.method == "GET":
        return render_template("/dashboard.html") 
-    #get RecentActivities
-    pipeline = [{'$match': {'name': name}},
-                    {'$unwind': '$activities'},
-                    {'$sort': {'activities.activityDate': -1}},
-                    {'$limit': 1}]
-    result = list(users.aggregate(pipeline))
-
-    if result:
-        latest_activity = result[0]['activities']
-        activity_type = latest_activity['activityType']
-        activity_date = latest_activity['activityDate']
-        recentActivity =(f"{activity_type}<br/>{activity_date}")
-    else:
-        recentActivity =("No activity.")  
-            
-        # Access user information from session
-        name = session.get("name")
-        dob = session.get("dob") 
+   
+    # Access user information from session
+    name = session.get("name")
+    dob = session.get("dob") 
     
     if name is None or dob is None:
         # Handle the case where session data is missing
         return redirect(url_for("login"))
     
-    # Create a sample graph using matplotlib
-    x = [1, 2, 3, 4, 5]
-    y = [10, 15, 7, 12, 5]
-    plt.plot(x, y)
-    plt.xlabel('X values')
-    plt.ylabel('Y values')
-    plt.title('Sample Graph')
-
-    # Save the graph to a BytesIO object
-    img = io.BytesIO()
-    plt.savefig(img, format='png')
-    img.seek(0)
-    graph_url = base64.b64encode(img.getvalue()).decode()
-    
-    return render_template("/dashboard.html", name=name, recentActivity=recentActivity)
+    return render_template("/dashboard.html", name=name)
 
 if __name__ == "__main__":
     app.run()

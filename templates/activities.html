@@ -1,0 +1,20 @@
+{% block title %}
+    Activities
+{% endblock %}
+
+
+{% block main %}
+<form action="/activities" method="post">
+    <div class="form-group">
+        <b>Activity</b> <input autocomplete="off" autofocus name="Activity" type="text" required>
+        <br>
+        <b>Date</b> <input autocomplete="off" autofocus name="Date" type="date" required>
+        <br>
+        <b>Start Time</b> <input autocomplete="off" autofocus name="StartTime" type="time" required>
+        <br>
+        <b>End Time</b> <input autocomplete="off" autofocus name="StartTime" type="time" required>
+        <br>
+        <input type="submit" class="btn btn-primary"></input>
+    </div>
+</form>
+{% endblock %}

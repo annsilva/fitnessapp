@@ -1,0 +1,17 @@
+{% block title %}
+    Sleep
+{% endblock %}
+
+
+{% block main %}
+<form action="/sleep" method="post">
+    <div class="form-group">
+        <b>Time Slept</b> <input autocomplete="off" autofocus name="TimeSleptHr" type="text" required><b>hr</b> 
+        <input autocomplete="off" autofocus name="TimeSleptMin" type="text" required><b>min</b> 
+        <br>
+        <b>Date</b> <input autocomplete="off" autofocus name="Date" type="date" required>
+        <br>
+        <input type="submit" class="btn btn-primary"></input>
+    </div>
+</form>
+{% endblock %}

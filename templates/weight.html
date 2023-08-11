@@ -1,0 +1,16 @@
+{% block title %}
+    Log Weight
+{% endblock %}
+
+
+{% block main %}
+<form action="/weight" method="post">
+    <div class="form-group">
+        <b>Weight</b> <input autocomplete="off" autofocus name="Weight" type="number" required>
+        <br>
+        <b>Date</b> <input autocomplete="off" autofocus name="Date" type="date" required>
+        <br>
+        <input type="submit" class="btn btn-primary"></input>
+    </div>
+</form>
+{% endblock %}

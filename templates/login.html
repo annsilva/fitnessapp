@@ -2,10 +2,6 @@
     Login
 {% endblock %}
 
-{% for message in get_flashed_messages() %}
-<h2>{{ message }}</h2>
-{% endfor %}
-
 {% block main %}
 <br>
 <form action="/login" method="post">
@@ -14,8 +10,9 @@
         <br>
         <b>Date of Birth</b> <input autocomplete="off" autofocus name="Date of Birth" id="dateOfBirth" type="date" required>
         <br>
-        <a href="{{ url_for('signupPage') }}">Sign Up</a>
-        <input type="submit" class="btn btn-primary"></input>
+        <a href="{{ url_for('signup') }}">Sign Up</a>
+        <button type="submit" class="btn btn-primary">Login</button>
     </div>
 </form>
 {% endblock %}
+

@@ -25,3 +25,7 @@
     </div>
 </form>
 {% endblock %}
+
+{% for message in get_flashed_messages() %}
+<h2>{{ message }}</h2>
+{% endfor %}

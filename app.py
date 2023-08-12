@@ -9,10 +9,11 @@ import plotly.express as px
 import pandas as pd
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
-app.debug = True
-app.secret_key = 'dggsfvdsfgrhsdgsdfsfsg'
+app.config.from_pyfile("config.py")
+app.debug = app.config['DEBUG']
+app.secret_key = app.config['SECRET_KEY']
 
-client = MongoClient('mongodb+srv://ann:root@fitnesscluster.jgxt2re.mongodb.net/')
+client = MongoClient(app.config['DATABASE_URI'])
 fitness_db = client.fitness
 users = fitness_db.users
 

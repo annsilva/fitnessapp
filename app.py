@@ -52,13 +52,13 @@ def signup():
 
 @app.route("/login", methods=["POST", "GET"])
 def login():
-    # Check if the session user is logged in or exists in the database TODO
+    # Check if the session user is logged in or exists in the database
     # In this code snippet, `name` and `dob` are variables that are used to retrieve the values
     # entered by the user in the login form.
     name = request.form.get("Name")
     dob = request.form.get("Date of Birth")
     currentUser = users.find_one({"name": name, "dateOfBirth": dob})
-
+    print(currentUser)
     if not currentUser:
         flash("Invalid username and date of birth. Please sign up")
         # If the user is not logged in, redirect to the login page
@@ -137,13 +137,12 @@ def sleep():
 
 @app.route("/dashboard", methods=["POST", "GET"])
 def dashboard():   
-        # Check if the session user is logged in or exists in the database TODO
     # In this code snippet, `name` and `dob` are variables that are used to retrieve the values
     # entered by the user in the login form.
     name = request.form.get("Name")
     dob = request.form.get("Date of Birth")
     currentUser = users.find_one({"name": name, "dateOfBirth": dob})
-
+    
     if not currentUser:
         flash("Invalid username and date of birth. Please sign up")
         # If the user is not logged in, redirect to the login page
@@ -212,8 +211,20 @@ def dashboard():
         df['sleepDate'] = pd.to_datetime(df['sleepDate'])
 
         # Create the sleep report graph using Plotly
-        fig = px.bar(df, x='sleepDate', y='totalTimeSleptHr', labels={'sleepDate': 'Sleep Date', 'totalTimeSleptHr': 'Total Time Slept (hours)'}, title='Sleep Report Graph')
+        fig = px.bar(df, x="sleepDate", y="totalTimeSleptHr", labels={'sleepDate': 'Sleep Date', 'totalTimeSleptHr': 'Total Time Slept (hours)'}, title='Sleep Report Graph')
+
+        # Extract data from the cursor
+        user_weights = currentUser.get('weightReport', [])
+        weight_df = pd.DataFrame(user_weights, columns = ['weightDate', 'weight'])
+        # Convert the 'weightDate' column to a datetime object
+        weight_df['weightDate'] = pd.to_datetime(weight_df['weightDate'])
+
+        # Set the 'weightDate' column as the index
+        weight_df.set_index('weightDate', inplace=True)
+        weight_fig = px.line(weight_df, y='weight', title='Weight Progress')
+
         graph_div = fig.to_html(full_html=False)
+        weight_div = weight_fig.to_html(full_html=False)
 
         # Extract activities data
         all_activities = currentUser.get('activities', [])
@@ -231,15 +242,16 @@ def dashboard():
         fig = px.bar(df, x='activityDate', y='activityType', orientation='h', labels={'activityDate': 'Activity Date', 'activityType': 'Activity Type'}, title='Activity Graph')
         graph_div_activities = fig.to_html(full_html=False)
         
-        
+    
         # If the user is logged in, render the dashboard page and pass the username as a parameter
-        return render_template("/dashboard.html", name=name, recentActivity=recentActivity, whole_duration=whole_duration,graph_div=graph_div, graph_div_activities=graph_div_activities) 
+        return render_template("/dashboard.html", name=name, recentActivity=recentActivity, whole_duration=whole_duration,graph_div=graph_div\
+                               ,weight_div=weight_div, graph_div_activities=graph_div_activities) 
         # In this code, `username` is a variable that is used to
         # store the name of the user who is currently logged in.
         # It is used to display the username on the dashboard
         # page and to retrieve and update user-specific data
         # from the database.
-    
+
 
 if __name__ == "__main__":
     app.run()

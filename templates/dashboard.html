@@ -57,7 +57,7 @@
                                             <img src="{{ url_for('static', filename='images/run.png') }}" />
                                         </div>
                                         <div class="metric-label d-inline-block float-right text-success font-weight-bold">
-                                            <span class="icon-circle-small icon-box-xs text-success bg-success-light"><i class="fa fa-fw fa-arrow-up"></i></span><span class="ml-1">{{wholeduration}}</span>
+                                            <span class="icon-circle-small icon-box-xs text-success bg-success-light"><i class="fa fa-fw fa-arrow-up"></i></span><span class="ml-1">{{whole_duration}}</span>
                                         </div>
                                     </div>
                                     <div class="card-body bg-light p-t-40 p-b-40">
@@ -70,11 +70,10 @@
                             </div>
                             <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-12">
                                 <div class="card">
-                                    <h5 class="card-header">Log Weight</h5>
+                                    <h5 class="card-header">Weight</h5>
                                     <div class="card-body">
                                         <div class="metric-value d-inline-block">
                                             <h1 class="mb-1"></h1>
-                                            {{ graph_div | safe }}
                                         </div>
                                         <div class="metric-label d-inline-block float-right text-secondary font-weight-bold">
                                             <span class="icon-circle-small icon-box-xs text-danger bg-danger-light">
@@ -94,10 +93,11 @@
                                     <h5 class="card-header">Sleep</h5>
                                     <div class="card-body">
                                         <div class="metric-value d-inline-block">
-                                            <h1 class="mb-1">graph here</h1>
+                                            {{ graph_div | safe }}
                                         </div>
                                         <div class="metric-label d-inline-block float-right text-success font-weight-bold">
-                                            <span class="icon-circle-small icon-box-xs text-success bg-success-light"><i class="fa fa-fw fa-arrow-up"></i></span><span class="ml-1">25%</span>
+                                            <span class="icon-circle-small icon-box-xs text-success bg-success-light">
+                                                <i class="fa fa-fw fa-arrow-up"></i></span><span class="ml-1">25%</span>
                                         </div>
                                     </div>
                                     <div class="card-body bg-light p-t-40 p-b-40">

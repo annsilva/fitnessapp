@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import io
 import base64
 import plotly.express as px
+import pandas as pd
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 app.debug = True
@@ -128,6 +129,7 @@ def sleep():
     sleepReport = {}
     sleepReport["timeSleptHr"] = request.form.get("TimeSleptHr")
     sleepReport["timeSleptMin"] = request.form.get("TimeSleptMin")
+    sleepReport["sleepDate"] = request.form.get("SleepDate")
 
     users.update_one({"name": name, "dateOfBirth": dob}, {"$push": {"sleepReport": sleepReport}})
 
@@ -151,6 +153,7 @@ def dashboard():
         session["name"] = name
         session["dob"] = dob
         
+        #Recent Activity Pipeline
         pipeline = [{'$match': {'name': name}},
                     {'$unwind': '$activities'},
                     {'$sort': {'activities.activityDate': -1}},
@@ -170,10 +173,11 @@ def dashboard():
                 'else': 0
             }
         }
-    }}
-]
+    }}]
+        
 
         result = list(users.aggregate(pipeline))
+        whole_duration=""
         
         if result:
             latest_activity = result[0]
@@ -182,19 +186,34 @@ def dashboard():
             duration = latest_activity['duration']    
             duration_hours = duration // 3600000  # Convert milliseconds to hours
             duration_minutes = (duration % 3600000) // 60000  # Convert remainder to minutes            
-            wholeduration = (f"{duration_hours} hrs {duration_minutes} mins")
+            whole_duration = (f"{duration_hours} hrs {duration_minutes} mins")
             recentActivity =(f"{activity_type}")
         else:
             recentActivity =("No activity.")  
-            
-        categories = ['Category 1', 'Category 2', 'Category 3', 'Category 4']
-        values = [25, 40, 30, 15]
+        
+        #Sleep Pipeline
+        # Extract sleep report data
+        sleep_report = currentUser.get('sleepReport', [])
 
-        fig = px.bar(x=categories, y=values, labels={'x': 'Categories', 'y': 'Values'}, title='Sample Bar Graph')
+        # Create a pandas DataFrame from the sleep report data
+        df = pd.DataFrame(sleep_report)
+
+        # Convert the 'sleepDate' column to datetime type
+        df['sleepDate'] = pd.to_datetime(df['sleepDate'])
+
+        # Group sleep data by week and calculate average time slept
+        df['week'] = df['sleepDate'].dt.to_period('W')
+        weekly_sleep_data = df.groupby('week').agg({'timeSleptHr': 'mean', 'timeSleptMin': 'mean'}).reset_index()
+
+        # Convert the 'week' column to a string representation
+        weekly_sleep_data['week'] = weekly_sleep_data['week'].astype(str)
+
+        # Create the weekly sleep graph using Plotly
+        fig = px.bar(weekly_sleep_data, x='week', y='timeSleptHr', labels={'week': 'Week', 'timeSleptHr': 'Average Time Slept (hours)'}, title='Weekly Sleep Graph')
         graph_div = fig.to_html(full_html=False)
-
+    
         # If the user is logged in, render the dashboard page and pass the username as a parameter
-        return render_template("/dashboard.html", name=name, recentActivity=recentActivity, wholeduration=wholeduration, graph_div=graph_div) 
+        return render_template("/dashboard.html", name=name, recentActivity=recentActivity, whole_duration=whole_duration, graph_div=graph_div) 
         # In this code, `username` is a variable that is used to
         # store the name of the user who is currently logged in.
         # It is used to display the username on the dashboard

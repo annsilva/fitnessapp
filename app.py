@@ -84,11 +84,12 @@ def activities():
         # Handle the case where session data is missing
         return redirect(url_for("login"))
     
-    activity = {}
-    activity["activityType"] = request.form.get("Activity")
-    activity["activityDate"] = request.form.get("Date")
-    activity["startTime"] = request.form.get("StartTime")
-    activity["endTime"] = request.form.get("EndTime")
+    activity = {
+        "activityType": request.form.get("Activity"),
+        "activityDate": request.form.get("Date"),
+        "startTime": request.form.get("StartTime"),
+        "endTime": request.form.get("EndTime")
+    }
 
     # Insert the activity into the activities sub-document of the user's record
     users.update_one({"name": name, "dateOfBirth": dob}, {"$push": {"activities": activity}},)
@@ -130,10 +131,11 @@ def sleep():
         # Handle the case where session data is missing
         return redirect(url_for("login"))
     
-    sleepReport = {}
-    sleepReport["timeSleptHr"] = request.form.get("TimeSleptHr")
-    sleepReport["timeSleptMin"] = request.form.get("TimeSleptMin")
-    sleepReport["sleepDate"] = request.form.get("SleepDate")
+    sleepReport = {
+        "timeSleptHr": request.form.get("TimeSleptHr"),
+        "timeSleptMin": request.form.get("TimeSleptMin"),
+        "sleepDate": request.form.get("SleepDate")
+    }
 
     users.update_one({"name": name, "dateOfBirth": dob}, {"$push": {"sleepReport": sleepReport}},)
 

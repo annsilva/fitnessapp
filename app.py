@@ -58,7 +58,7 @@ def login():
     name = request.form.get("Name")
     dob = request.form.get("Date of Birth")
     currentUser = users.find_one({"name": name, "dateOfBirth": dob})
-
+    print(currentUser)
     if not currentUser:
         flash("Invalid username and date of birth. Please sign up")
         # If the user is not logged in, redirect to the login page
@@ -137,13 +137,12 @@ def sleep():
 
 @app.route("/dashboard", methods=["POST", "GET"])
 def dashboard():   
-        # Check if the session user is logged in or exists in the database TODO
     # In this code snippet, `name` and `dob` are variables that are used to retrieve the values
     # entered by the user in the login form.
     name = request.form.get("Name")
     dob = request.form.get("Date of Birth")
     currentUser = users.find_one({"name": name, "dateOfBirth": dob})
-
+    
     if not currentUser:
         flash("Invalid username and date of birth. Please sign up")
         # If the user is not logged in, redirect to the login page
@@ -174,9 +173,6 @@ def dashboard():
             }
         }
     }}]
-        user_weights = list(users.find({"name": name, "dateOfBirth": dob}, {"weightReport": 1, "_id": 0}))
-        print(user_weights)
-
         result = list(users.aggregate(pipeline))
         whole_duration=""
         
@@ -195,6 +191,10 @@ def dashboard():
         #Sleep Pipeline
         # Extract sleep report data
         sleep_report = currentUser.get('sleepReport', [])
+        # Add columns to the DataFrame
+        weekly_sleep_data = {}
+        weekly_sleep_data['week'] = []         # Empty list for week numbers
+        weekly_sleep_data['timeSleptHr'] = []  # Empty list for average time slept (hours)
 
         # Create a pandas DataFrame from the sleep report data
         df = pd.DataFrame(sleep_report)
@@ -210,22 +210,23 @@ def dashboard():
         weekly_sleep_data['week'] = weekly_sleep_data['week'].astype(str)
 
         # Create the weekly sleep graph using Plotly
-        fig = px.bar(weekly_sleep_data, x='week', y='timeSleptHr', labels={'week': 'Week', 'timeSleptHr': 'Average Time Slept (hours)'}, title='Weekly Sleep Graph')
-        graph_div = fig.to_html(full_html=False)
+        fig = px.bar(weekly_sleep_data, x="week", y="timeSleptHr", labels={'week': 'Week', 'timeSleptHr': 'Average Time Slept (hours)'}, title='Weekly Sleep Graph')
 
         # Extract data from the cursor
-        if not user_weights or not user_weights[0]:
-            weight_fig = px.line(x=[0], y=[0], title='No Data Available')
-        else:
-            weight_data = user_weights[0].get('weightReport', [])
-            weight_dates = [entry['weightDate'] for entry in weight_data]
-            weights = [entry['weight'] for entry in weight_data]
-            weight_fig = px.line(x=weight_dates, y=weights, title='Weight Progress')
+        user_weights = currentUser.get('weightReport', [])
+        weight_df = pd.DataFrame(user_weights, columns = ['weightDate', 'weight'])
+        # Convert the 'weightDate' column to a datetime object
+        weight_df['weightDate'] = pd.to_datetime(weight_df['weightDate'])
 
+        # Set the 'weightDate' column as the index
+        weight_df.set_index('weightDate', inplace=True)
+        weight_fig = px.line(weight_df, y='weight', title='Weight Progress')
+
+        graph_div = fig.to_html(full_html=False)
         weight_div = weight_fig.to_html(full_html=False)
 
         # If the user is logged in, render the dashboard page and pass the username as a parameter
-        return render_template("/dashboard.html", name=name, recentActivity=recentActivity, wholeduration=wholeduration, graph_div=graph_div\
+        return render_template("/dashboard.html", name=name, recentActivity=recentActivity, whole_duration=whole_duration, graph_div=graph_div\
                                ,weight_div=weight_div) 
         # In this code, `username` is a variable that is used to
         # store the name of the user who is currently logged in.

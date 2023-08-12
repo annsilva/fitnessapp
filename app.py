@@ -51,7 +51,7 @@ def signup():
 
 @app.route("/login", methods=["POST", "GET"])
 def login():
-    # Check if the session user is logged in or exists in the database TODO
+    # Check if the session user is logged in or exists in the database
     # In this code snippet, `name` and `dob` are variables that are used to retrieve the values
     # entered by the user in the login form.
     name = request.form.get("Name")
@@ -175,6 +175,7 @@ def sleep():
     sleepReport = {}
     sleepReport["timeSleptHr"] = request.form.get("TimeSleptHr")
     sleepReport["timeSleptMin"] = request.form.get("TimeSleptMin")
+    sleepReport["sleepDate"] = request.form.get("Date")
 
     users.update_one({"name": name, "dateOfBirth": dob}, {"$push": {"sleepReport": sleepReport}})
 
@@ -208,17 +209,18 @@ def dashboard():
                         'startTime': '$activities.startTime',
                         'endTime': '$activities.endTime',
                         'duration': {
-            '$cond': {'if': {'$and': [{'$ne': ['$activities.startTime', None]},{'$ne': ['$activities.endTime', None]}]},
-                'then': {'$subtract': [{
-                            '$dateFromString': {'dateString': {'$concat': ['$activities.activityDate','T','$activities.endTime']},
-                                'format': '%Y-%m-%dT%H:%M'}},
-                        {'$dateFromString': {'dateString': {'$concat': ['$activities.activityDate','T','$activities.startTime']},
-                                'format': '%Y-%m-%dT%H:%M'}}]},
-                'else': 0
-            }
-        }
-    }}
-]
+                            '$cond': {'if': {'$and': [{'$ne': ['$activities.startTime', None]},{'$ne': ['$activities.endTime', None]}]},
+                                'then': {'$subtract': [{
+                                            '$dateFromString': {'dateString': {'$concat': ['$activities.activityDate','T','$activities.endTime']},
+                                                'format': '%Y-%m-%dT%H:%M'}},
+                                        {'$dateFromString': {'dateString': {'$concat': ['$activities.activityDate','T','$activities.startTime']},
+                                                'format': '%Y-%m-%dT%H:%M'}}]},
+                                'else': 0
+                            }
+                        }
+                    }}]
+        user_weights = list(users.find({"name": name, "dateOfBirth": dob}, {"weightReport": 1, "_id": 0}))
+        print(user_weights)
 
         result = list(users.aggregate(pipeline))
         
@@ -232,7 +234,8 @@ def dashboard():
             wholeduration = (f"{duration_hours} hrs {duration_minutes} mins")
             recentActivity =(f"{activity_type}")
         else:
-            recentActivity =("No activity.")  
+            recentActivity =("No activity.") 
+            wholeduration = ("0 hrs") 
             
         categories = ['Category 1', 'Category 2', 'Category 3', 'Category 4']
         values = [25, 40, 30, 15]
@@ -240,14 +243,26 @@ def dashboard():
         fig = px.bar(x=categories, y=values, labels={'x': 'Categories', 'y': 'Values'}, title='Sample Bar Graph')
         graph_div = fig.to_html(full_html=False)
 
+        # Extract data from the cursor
+        if not user_weights or not user_weights[0]:
+            weight_fig = px.line(x=[0], y=[0], title='No Data Available')
+        else:
+            weight_data = user_weights[0].get('weightReport', [])
+            weight_dates = [entry['weightDate'] for entry in weight_data]
+            weights = [entry['weight'] for entry in weight_data]
+            weight_fig = px.line(x=weight_dates, y=weights, title='Weight Progress')
+
+        weight_div = weight_fig.to_html(full_html=False)
+
         # If the user is logged in, render the dashboard page and pass the username as a parameter
-        return render_template("/dashboard.html", name=name, recentActivity=recentActivity, wholeduration=wholeduration, graph_div=graph_div) 
+        return render_template("/dashboard.html", name=name, recentActivity=recentActivity, wholeduration=wholeduration, graph_div=graph_div\
+                               ,weight_div=weight_div) 
         # In this code, `username` is a variable that is used to
         # store the name of the user who is currently logged in.
         # It is used to display the username on the dashboard
         # page and to retrieve and update user-specific data
         # from the database.
-    
+
 
 if __name__ == "__main__":
     app.run()

@@ -215,9 +215,25 @@ def dashboard():
         fig = px.bar(df, x='sleepDate', y='totalTimeSleptHr', labels={'sleepDate': 'Sleep Date', 'totalTimeSleptHr': 'Total Time Slept (hours)'}, title='Sleep Report Graph')
         graph_div = fig.to_html(full_html=False)
 
+        # Extract activities data
+        all_activities = currentUser.get('activities', [])
 
+        if not all_activities:
+            return "No activity data available."
+
+        # Create a pandas DataFrame from the activities data
+        df = pd.DataFrame(all_activities)
+
+        # Convert activityDate to datetime type
+        df['activityDate'] = pd.to_datetime(df['activityDate'])
+
+        # Create the activity graph using Plotly
+        fig = px.bar(df, x='activityDate', y='activityType', orientation='h', labels={'activityDate': 'Activity Date', 'activityType': 'Activity Type'}, title='Activity Graph')
+        graph_div_activities = fig.to_html(full_html=False)
+        
+        
         # If the user is logged in, render the dashboard page and pass the username as a parameter
-        return render_template("/dashboard.html", name=name, recentActivity=recentActivity, whole_duration=whole_duration,graph_div=graph_div) 
+        return render_template("/dashboard.html", name=name, recentActivity=recentActivity, whole_duration=whole_duration,graph_div=graph_div, graph_div_activities=graph_div_activities) 
         # In this code, `username` is a variable that is used to
         # store the name of the user who is currently logged in.
         # It is used to display the username on the dashboard

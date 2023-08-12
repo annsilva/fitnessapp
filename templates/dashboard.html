@@ -34,7 +34,7 @@
                 <div><h5 class="card-header">Dashboard</h5></div>
                 <div><h5 class="card-header">{{ name }}</h5></div>
                 <div class="page-breadcrumb">
-                        <div>
+                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
                             <nav aria-label="breadcrumb">
                                 <ol class="breadcrumb">
                                     <li class="breadcrumb-item"><a href="#" class="breadcrumb-link">Dashboard</a></li>                            
@@ -60,6 +60,13 @@
                                         </div>
                                         <div class="metric-label d-inline-block float-right text-success font-weight-bold">
                                             <span class="icon-circle-small icon-box-xs text-success bg-success-light"><i class="fa fa-fw fa-arrow-up"></i></span><span class="ml-1">{{whole_duration}}</span>
+                                        </div>
+                                        <div>
+                                            {% if graph_div_activities %}
+                                                <div id="graph_div_activities">{{ graph_div_activities | safe }}</div>
+                                            {% else %}
+                                                <p>No activities data available.</p>
+                                            {% endif %}
                                         </div>
                                     </div>
                                     <div class="card-body bg-light p-t-40 p-b-40">

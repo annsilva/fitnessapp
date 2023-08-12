@@ -42,12 +42,19 @@ def signup():
     user_login["dateOfBirth"] = dob
     user_login["heightFt"] = heightFt
     user_login["heightIn"] = heightIn
-    user_login["weightReports"] = { "weight": weight, "weightDate": datetime.now() }
+    # Get the current date and time
+    current_datetime = datetime.now()
+    # Convert the datetime.date object to a datetime.datetime object
+    current_datetime = datetime(current_datetime.year, current_datetime.month, current_datetime.day)
+    weight_data = { "weight": weight, "weightDate": current_datetime }
     user_login["sex"] = sex
-  #  user_login["bmi"] = 
 
     # Add users into the mongoDB
-    users.insert_one(user_login)
+    user = users.insert_one(user_login)
+    users.update_one(
+        {'_id': user.inserted_id},
+        {'$push': {'weightReports': weight_data}},  # Use $push to add to the array
+    )
 
     return render_template("login.html")
 

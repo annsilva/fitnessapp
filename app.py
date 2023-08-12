@@ -1,10 +1,6 @@
 from flask import Flask, render_template, request, flash, redirect, url_for, session
 from pymongo import MongoClient
-from bson import ObjectId
 from datetime import datetime
-import matplotlib.pyplot as plt
-import io
-import base64
 import plotly.express as px
 import pandas as pd
 
@@ -73,7 +69,7 @@ def login():
         return redirect(url_for("signup"))
     else:
         return redirect(url_for("login"))
-  
+    
 
 @app.route("/activities", methods=["POST", "GET"])
 def activities():
@@ -95,7 +91,7 @@ def activities():
     activity["endTime"] = request.form.get("EndTime")
 
     # Insert the activity into the activities sub-document of the user's record
-    users.update_one({"name": name, "dateOfBirth": dob}, {"$push": {"activities": activity}})
+    users.update_one({"name": name, "dateOfBirth": dob}, {"$push": {"activities": activity}},)
 
     return render_template("/dashboard.html", name=name)
 
@@ -112,11 +108,12 @@ def weight():
         # Handle the case where session data is missing
         return redirect(url_for("login"))
     
-    weightReport = {}
-    weightReport["weight"] = request.form.get("Weight")
-    weightReport["weightDate"] = request.form.get("Date")
+    weightReport = {
+        "weight": request.form.get("Weight"),
+        "weightDate": request.form.get("Date")
+    }
 
-    users.update_one({"name": name, "dateOfBirth": dob}, {"$push": {"weightReport": weightReport}})
+    users.update_one({"name": name, "dateOfBirth": dob}, {"$push": {"weightReports": weightReport}, })
 
     return render_template("/dashboard.html", name=name)
 
@@ -138,7 +135,7 @@ def sleep():
     sleepReport["timeSleptMin"] = request.form.get("TimeSleptMin")
     sleepReport["sleepDate"] = request.form.get("SleepDate")
 
-    users.update_one({"name": name, "dateOfBirth": dob}, {"$push": {"sleepReport": sleepReport}})
+    users.update_one({"name": name, "dateOfBirth": dob}, {"$push": {"sleepReport": sleepReport}},)
 
     return render_template("/dashboard.html", name=name)
 
@@ -154,111 +151,98 @@ def dashboard():
         flash("Invalid username and date of birth. Please sign up")
         # If the user is not logged in, redirect to the login page
         return redirect(url_for("signup"))
-    else:
-        # Set user information in session
-        session["name"] = name
-        session["dob"] = dob
-        
-        #Recent Activity Pipeline
-        pipeline = [{'$match': {'name': name}},
-                    {'$unwind': '$activities'},
-                    {'$sort': {'activities.activityDate': -1}},
-                    {'$limit': 1},
-                    {'$project': {
-                        'activityType': '$activities.activityType',
-                        'activityDate': '$activities.activityDate',
-                        'startTime': '$activities.startTime',
-                        'endTime': '$activities.endTime',
-                        'duration': {
-            '$cond': {'if': {'$and': [{'$ne': ['$activities.startTime', None]},{'$ne': ['$activities.endTime', None]}]},
-                'then': {'$subtract': [{
-                            '$dateFromString': {'dateString': {'$concat': ['$activities.activityDate','T','$activities.endTime']},
-                                'format': '%Y-%m-%dT%H:%M'}},
-                        {'$dateFromString': {'dateString': {'$concat': ['$activities.activityDate','T','$activities.startTime']},
-                                'format': '%Y-%m-%dT%H:%M'}}]},
-                'else': 0
-            }
-        }
-        }}]
-        
 
-        result = list(users.aggregate(pipeline))
-        whole_duration=""
-        
-        if result:
-            latest_activity = result[0]
-            activity_type = latest_activity['activityType']
-            activity_date = latest_activity['activityDate']
-            duration = latest_activity['duration']    
-            duration_hours = duration // 3600000  # Convert milliseconds to hours
-            duration_minutes = (duration % 3600000) // 60000  # Convert remainder to minutes            
-            whole_duration = (f"{duration_hours} hrs {duration_minutes} mins")
-            recentActivity =(f"{activity_type}")
-        else:
-            recentActivity =("No activity.")  
-        
-       
-        # Extract sleep report data
-        sleep_report = currentUser.get('sleepReport', [])
-
-        if not sleep_report:
-            return "No sleep report data available."
-
-        # Create a pandas DataFrame from the sleep report data
-        df = pd.DataFrame(sleep_report, columns= ['timeSleptHr','timeSleptMin','sleepDate'])
-
-        # Convert time slept columns to numeric
-        df['timeSleptHr'] = pd.to_numeric(df['timeSleptHr'])
-        df['timeSleptMin'] = pd.to_numeric(df['timeSleptMin'])
-
-        # Calculate total time slept in hours
-        df['totalTimeSleptHr'] = df['timeSleptHr'] + df['timeSleptMin'] / 60
-
-        # Convert the 'sleepDate' column to datetime type
-        df['sleepDate'] = pd.to_datetime(df['sleepDate'])
-
-        # Create the sleep report graph using Plotly
-        fig = px.bar(df, x="sleepDate", y="totalTimeSleptHr", labels={'sleepDate': 'Sleep Date', 'totalTimeSleptHr': 'Total Time Slept (hours)'}, title='Sleep Report Graph')
-
-        # Extract data from the cursor
-        user_weights = currentUser.get('weightReport', [])
-        weight_df = pd.DataFrame(user_weights, columns = ['weightDate', 'weight'])
-        # Convert the 'weightDate' column to a datetime object
-        weight_df['weightDate'] = pd.to_datetime(weight_df['weightDate'])
-
-        # Set the 'weightDate' column as the index
-        weight_df.set_index('weightDate', inplace=True)
-        weight_fig = px.line(weight_df, y='weight', title='Weight Progress')
-
-        graph_div = fig.to_html(full_html=False)
-        weight_div = weight_fig.to_html(full_html=False)
-
-        # Extract activities data
-        all_activities = currentUser.get('activities', [])
-
-        if not all_activities:
-            return "No activity data available."
-
-        # Create a pandas DataFrame from the activities data
-        df = pd.DataFrame(all_activities)
-
-        # Convert activityDate to datetime type
-        df['activityDate'] = pd.to_datetime(df['activityDate'])
-
-        # Create the activity graph using Plotly
-        fig = px.bar(df, x='activityDate', y='activityType', orientation='h', labels={'activityDate': 'Activity Date', 'activityType': 'Activity Type'}, title='Activity Graph')
-        graph_div_activities = fig.to_html(full_html=False)
-        
+    # Set user information in session
+    session["name"] = name
+    session["dob"] = dob
     
-        # If the user is logged in, render the dashboard page and pass the username as a parameter
-        return render_template("/dashboard.html", name=name, recentActivity=recentActivity, whole_duration=whole_duration,graph_div=graph_div\
-                               ,weight_div=weight_div, graph_div_activities=graph_div_activities) 
-        # In this code, `username` is a variable that is used to
-        # store the name of the user who is currently logged in.
-        # It is used to display the username on the dashboard
-        # page and to retrieve and update user-specific data
-        # from the database.
+    #Recent Activity Pipeline
+    pipeline = [{'$match': {'name': name}},
+                {'$unwind': '$activities'},
+                {'$sort': {'activities.activityDate': -1}},
+                {'$limit': 1},
+                {'$project': {
+                    'activityType': '$activities.activityType',
+                    'activityDate': '$activities.activityDate',
+                    'startTime': '$activities.startTime',
+                    'endTime': '$activities.endTime',
+                    'duration': {
+        '$cond': {'if': {'$and': [{'$ne': ['$activities.startTime', None]},{'$ne': ['$activities.endTime', None]}]},
+            'then': {'$subtract': [{
+                        '$dateFromString': {'dateString': {'$concat': ['$activities.activityDate','T','$activities.endTime']},
+                            'format': '%Y-%m-%dT%H:%M'}},
+                    {'$dateFromString': {'dateString': {'$concat': ['$activities.activityDate','T','$activities.startTime']},
+                            'format': '%Y-%m-%dT%H:%M'}}]},
+            'else': 0
+                }       
+        }
+    }}]
+    result = list(users.aggregate(pipeline))
+    whole_duration=""
+    
+    if result:
+        latest_activity = result[0]
+        activity_type = latest_activity['activityType']
+        activity_date = latest_activity['activityDate']
+        duration = latest_activity['duration']    
+        duration_hours = duration // 3600000  # Convert milliseconds to hours
+        duration_minutes = (duration % 3600000) // 60000  # Convert remainder to minutes            
+        whole_duration = (f"{duration_hours} hrs {duration_minutes} mins")
+        recentActivity =(f"{activity_type}")
+    else:
+        recentActivity =("No activity.")  
+    
+    #Sleep Pipeline
+    # Extract sleep report data
+    sleep_report = currentUser.get('sleepReport', [])
+    # Add columns to the DataFrame
+    weekly_sleep_data = {}
+    weekly_sleep_data['week'] = []         # Empty list for week numbers
+    weekly_sleep_data['timeSleptHr'] = []  # Empty list for average time slept (hours)
+    # Create a pandas DataFrame from the sleep report data
+    df = pd.DataFrame(sleep_report, columns= ['timeSleptHr','timeSleptMin','sleepDate'])
+    # Convert the 'sleepDate' column to datetime type
+    df['sleepDate'] = pd.to_datetime(df['sleepDate'])
+    # Group sleep data by week and calculate average time slept
+    df['week'] = df['sleepDate'].dt.to_period('W')
+    weekly_sleep_data = df.groupby('week').agg({'timeSleptHr': 'mean', 'timeSleptMin': 'mean'}).reset_index()
+    # Convert the 'week' column to a string representation
+    weekly_sleep_data['week'] = weekly_sleep_data['week'].astype(str)
+    # Create the weekly sleep graph using Plotly
+    fig = px.bar(weekly_sleep_data, x="week", y="timeSleptHr", labels={'week': 'Week', 'timeSleptHr': 'Average Time Slept (hours)'}, title='Weekly Sleep Graph')
+    graph_div = fig.to_html(full_html=False)
 
+    # Extract data from the cursor
+    user_weights = currentUser.get('weightReports', [])
+    print(user_weights)
+    weight_df = pd.DataFrame(user_weights, columns = ['weightDate', 'weight'])
+    # Convert the 'weightDate' column to a datetime object
+    weight_df['weightDate'] = pd.to_datetime(weight_df['weightDate'])
+    # Set the 'weightDate' column as the index
+    weight_df.set_index('weightDate', inplace=True)
+    weight_fig = px.line(weight_df, y='weight', title='Weight Progress')
+    weight_div = weight_fig.to_html(full_html=False)
+
+    # Extract activities data
+    all_activities = currentUser.get('activities', [])
+    # Create a pandas DataFrame from the activities data
+    df = pd.DataFrame(all_activities, columns=['activityType', 'activityDate'])
+
+    # Convert activityDate to datetime type
+    df['activityDate'] = pd.to_datetime(df['activityDate'])
+    df.set_index('activityDate', inplace=True)
+    # Create the activity graph using Plotly
+    fig = px.bar(df, y='activityType', orientation='h', labels={'activityDate': 'Activity Date', 'activityType': 'Activity Type'}, title='Activity Graph')
+    graph_div_activities = fig.to_html(full_html=False)
+
+    # If the user is logged in, render the dashboard page and pass the username as a parameter
+    return render_template("/dashboard.html", name=name, recentActivity=recentActivity, whole_duration=whole_duration,graph_div=graph_div\
+                            ,weight_div=weight_div, graph_div_activities=graph_div_activities) 
+    # In this code, `username` is a variable that is used to
+    # store the name of the user who is currently logged in.
+    # It is used to display the username on the dashboard
+    # page and to retrieve and update user-specific data
+    # from the database.
 
 if __name__ == "__main__":
     app.run()

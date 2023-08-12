@@ -1,31 +1,102 @@
-{% block title %}
-    Sign Up
-{% endblock %}
+<!DOCTYPE html>
+<html>
+<head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>Fitness</title>
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/fonts/circular-std/style.css') }}" >
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='libs/css/style.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/fonts/fontawesome/css/fontawesome-all.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/datepicker/tempusdominus-bootstrap-4.css') }}" />
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/inputmask/css/inputmask.css') }}" />
+</head>
+<body>
+    <!-- Placeholders for the header and footer content -->
+    <div id="header-placeholder"></div>
 
-{% block main %}
-<br>
-<form action="/signup" method="post">
-    <div class="form-group">
-        <b>Name</b> <input autocomplete="off" autofocus name="Name" id="name" type="text" required>
-        <br>
-        <b>Date of Birth</b> <input autocomplete="off" autofocus name="Date of Birth" id="dateOfBirth" type="date" required>
-        <br>
-        <b>Height</b> <input autocomplete="off" autofocus name="HeightFt" id="heightFt" type="number" required> <b>ft</b> 
-        <input autocomplete="off" autofocus name="HeightIn" id="heightIn" type="number" required> <b>in</b>
-        <br>
-        <b>Weight</b> <input autocomplete="off" autofocus name="Weight" id="weight" type="number" required>
-        <b>Sex</b>
-        <select name="Sex" id="sex">
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-        </select>
-        <br>
-        <a href="{{ url_for('home') }}">Cancel</a>
-        <button type="submit" class="btn btn-primary">Sign Up</button>
+    <!-- Main content of the inner page -->
+    <div id="content" class="dashboard-wrapper">
+        <div class="row">
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                <div class="page-header" id="top">
+                    <h2 class="pageheader-title">Fitness App</h2>
+                </div>
+            </div>
+        </div>        
+        <div class="row">
+            <div class="card">
+                {% block title %}
+                <h5 class="card-header">Sign Up</h5>
+                {% endblock %}                
+                <div class="card-body">
+                    {% block main %}
+                    <form action="/signup" method="post">                    
+                            <div class="form-group">
+                                <label for="inputText3" class="col-form-label">Name</label>
+                                <input autocomplete="off" autofocus name="Name" id="name" type="text" required class="form-control">                
+                            </div>
+                            <div class="form-group">
+                                <label>Date Of Birth</label>
+                                <input class="form-control date-inputmask"  autocomplete="off" autofocus name="Date of Birth" id="dateOfBirth" type="date" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="inputText3" class="col-form-label">Height</label>
+                                <input autocomplete="off" autofocus name="HeightFt" id="heightFt" type="number" required class=".form-control-custom">                                 
+                                <label for="inputText3" class="col-form-label">ft</label>
+                                <input autocomplete="off" autofocus name="HeightIn" id="heightIn" type="number" required class=".form-control-custom">
+                                <label for="inputText3" class="col-form-label">in</label>                 
+                            </div>
+                            <div class="form-group">
+                                <label for="inputText3" class="col-form-label">Weight</label>
+                                <input autocomplete="off" autofocus name="Weight" id="weight" type="number" required class=".form-control-custom">
+                                <label for="inputText3" class="col-form-label">Sex</label>                               
+                                    <select name="Sex" id="sex" class="col-form-label">
+                                        <option value="rathernotsay" class="col-form-label">--Rather Not Say--</option>
+                                        <option value="male" class="col-form-label">Male</option>
+                                        <option value="female" class="col-form-label">Female</option>
+                                    </select>
+                            </div>
+                            <div class="form-group">                               
+                                <div class="col-sm-6 pl-0">
+                                    <p class="text-right">
+                                        <button type="submit" class="btn btn-space btn-primary">Sign Up</button>
+                                        <button id="home" class="btn btn-space btn-secondary">Cancel</button>
+                                    </p>
+                                </div>
+                            </div>
+                    </form>
+                    {% endblock %}
+                </div>
+            </div>
     </div>
-</form>
-{% endblock %}
+    </div>
 
-{% for message in get_flashed_messages() %}
-<h2>{{ message }}</h2>
-{% endfor %}
+    <div id="footer-placeholder"></div>
+
+    <script>
+        // Function to load and insert the HTML content
+        function loadHTML(url, targetId) {
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    document.getElementById(targetId).innerHTML = xhr.responseText;
+                }
+            };
+            xhr.open('GET', url, true);
+            xhr.send();
+        }
+
+        // Call the function to load and insert the header and footer
+        loadHTML('header.html', 'header-placeholder');
+        loadHTML('footer.html', 'footer-placeholder');
+
+        document.getElementById('home').addEventListener('click', function() {
+            window.location.href = "{{ url_for('home') }}";
+        });
+    </script>
+</body>
+</html>
+

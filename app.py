@@ -194,11 +194,11 @@ def dashboard():
         # Extract sleep report data
         sleep_report = currentUser.get('sleepReport', [])
 
-        if not sleep_report:
-            return "No sleep report data available."
+        # if not sleep_report:
+        #     return "No sleep report data available."
 
         # Create a pandas DataFrame from the sleep report data
-        df = pd.DataFrame(sleep_report)
+        df = pd.DataFrame(sleep_report,columns=['timeSleptHr', 'timeSleptMin' , 'sleepDate'])
 
         # Convert time slept columns to numeric
         df['timeSleptHr'] = pd.to_numeric(df['timeSleptHr'])
@@ -229,11 +229,11 @@ def dashboard():
         # Extract activities data
         all_activities = currentUser.get('activities', [])
 
-        if not all_activities:
-            return "No activity data available."
+        # if not all_activities:
+        #     return "No activity data available."
 
         # Create a pandas DataFrame from the activities data
-        df = pd.DataFrame(all_activities)
+        df = pd.DataFrame(all_activities,columns=['activityDate','activityType'])
 
         # Convert activityDate to datetime type
         df['activityDate'] = pd.to_datetime(df['activityDate'])

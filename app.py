@@ -173,7 +173,7 @@ def dashboard():
                 'else': 0
             }
         }
-    }}]
+        }}]
         
 
         result = list(users.aggregate(pipeline))
@@ -191,29 +191,33 @@ def dashboard():
         else:
             recentActivity =("No activity.")  
         
-        #Sleep Pipeline
+       
         # Extract sleep report data
         sleep_report = currentUser.get('sleepReport', [])
+
+        if not sleep_report:
+            return "No sleep report data available."
 
         # Create a pandas DataFrame from the sleep report data
         df = pd.DataFrame(sleep_report)
 
+        # Convert time slept columns to numeric
+        df['timeSleptHr'] = pd.to_numeric(df['timeSleptHr'])
+        df['timeSleptMin'] = pd.to_numeric(df['timeSleptMin'])
+
+        # Calculate total time slept in hours
+        df['totalTimeSleptHr'] = df['timeSleptHr'] + df['timeSleptMin'] / 60
+
         # Convert the 'sleepDate' column to datetime type
         df['sleepDate'] = pd.to_datetime(df['sleepDate'])
 
-        # Group sleep data by week and calculate average time slept
-        df['week'] = df['sleepDate'].dt.to_period('W')
-        weekly_sleep_data = df.groupby('week').agg({'timeSleptHr': 'mean', 'timeSleptMin': 'mean'}).reset_index()
-
-        # Convert the 'week' column to a string representation
-        weekly_sleep_data['week'] = weekly_sleep_data['week'].astype(str)
-
-        # Create the weekly sleep graph using Plotly
-        fig = px.bar(weekly_sleep_data, x='week', y='timeSleptHr', labels={'week': 'Week', 'timeSleptHr': 'Average Time Slept (hours)'}, title='Weekly Sleep Graph')
+        # Create the sleep report graph using Plotly
+        fig = px.bar(df, x='sleepDate', y='totalTimeSleptHr', labels={'sleepDate': 'Sleep Date', 'totalTimeSleptHr': 'Total Time Slept (hours)'}, title='Sleep Report Graph')
         graph_div = fig.to_html(full_html=False)
-    
+
+
         # If the user is logged in, render the dashboard page and pass the username as a parameter
-        return render_template("/dashboard.html", name=name, recentActivity=recentActivity, whole_duration=whole_duration, graph_div=graph_div) 
+        return render_template("/dashboard.html", name=name, recentActivity=recentActivity, whole_duration=whole_duration,graph_div=graph_div) 
         # In this code, `username` is a variable that is used to
         # store the name of the user who is currently logged in.
         # It is used to display the username on the dashboard

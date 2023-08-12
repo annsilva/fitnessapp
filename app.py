@@ -76,7 +76,6 @@ def activities():
     name = session.get("name")
     dob = session.get("dob")
     
-
     if name is None or dob is None:
         # Handle the case where session data is missing
         return redirect(url_for("login"))
@@ -197,7 +196,7 @@ def dashboard():
         weekly_sleep_data['timeSleptHr'] = []  # Empty list for average time slept (hours)
 
         # Create a pandas DataFrame from the sleep report data
-        df = pd.DataFrame(sleep_report)
+        df = pd.DataFrame(sleep_report, columns= ['timeSleptHr','timeSleptMin','sleepDate'])
 
         # Convert the 'sleepDate' column to datetime type
         df['sleepDate'] = pd.to_datetime(df['sleepDate'])

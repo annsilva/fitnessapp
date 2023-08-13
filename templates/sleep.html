@@ -29,7 +29,21 @@
         <div class="row">
             <div class="card">
                 {% block title %}
-                <h5 class="card-header">Sleep</h5>
+                <div><h5 class="card-header">Sleep</h5></div>
+                <div><h5 class="card-header">{{ name }}</h5></div>
+                <div class="page-breadcrumb">
+                        <div>
+                            <nav aria-label="breadcrumb">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" class="breadcrumb-link">Dashboard</a></li>                            
+                                    <li class="breadcrumb-item active" aria-current="page" ><a href="{{ url_for('activities') }}" class="breadcrumb-link">Log Activity</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page" ><a href="{{ url_for('weight') }}" class="breadcrumb-link">Log Weight</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page" ><a href="#" class="breadcrumb-link">Log Sleep</a></li>  
+                                    <li class="breadcrumb-item active" aria-current="page" ><a href="{{ url_for('logout') }}" class="breadcrumb-link">Logout</a></li>
+                                </ol>
+                            </nav>  
+                    </div> 
+                </div>      
                 {% endblock %}                
                 <div class="card-body">
                     {% block main %}

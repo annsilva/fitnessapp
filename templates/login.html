@@ -33,7 +33,7 @@
                 {% endblock %}                
                 <div class="card-body">
                     {% block main %}
-                    <form action="/dashboard" method="post">
+                    <form action="/login" method="post">
                     
                             <div class="form-group">
                                 <label for="inputText3" class="col-form-label">Name</label>
@@ -42,6 +42,15 @@
                             <div class="form-group">
                                 <label>Date Of Birth</label>
                                 <input class="form-control date-inputmask"  autocomplete="off" autofocus name="Date of Birth" id="dateOfBirth" type="date" required>
+                            </div>
+                            <div class="form-group">
+                            {% with messages = get_flashed_messages() %}
+                                {% if messages %}
+                                {% for message in messages %}
+                                    <p>{{ message }}<p>
+                                {% endfor %}
+                                {% endif %}
+                            {% endwith %}
                             </div>
                             <div class="form-group">
                                 <button type="submit" class="btn btn-primary">Login</button>

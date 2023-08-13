@@ -23,6 +23,7 @@ def signup():
     if request.method == "GET":
         # If it's a GET request, render the signup page
         return render_template("signup.html")
+
     # Get details from user
     name = request.form.get("Name")
     dob = request.form.get("Date of Birth")
@@ -62,27 +63,37 @@ def login():
     name = request.form.get("Name")
     dob = request.form.get("Date of Birth")
     currentUser = users.find_one({"name": name, "dateOfBirth": dob})
-    print(currentUser)
     if not currentUser:
         flash("Invalid username and date of birth. Please sign up")
         # If the user is not logged in, redirect to the login page
-        return redirect(url_for("signup"))
+        return redirect(url_for("home"))
     else:
-        return redirect(url_for("login"))
-    
+        # Set user information in session
+        session["name"] = name
+        session["dob"] = dob
+        return redirect(url_for("dashboard"))
 
+@app.route("/logout", methods=["POST", "GET"])
+def logout():
+    # Check if the session user is logged in or exists in the database
+    # In this code snippet, `name` and `dob` are variables that are used to retrieve the values
+    # entered by the user in the login form.
+    session.clear()
+    flash("Logout successful")
+    return redirect(url_for("home"))
+    
 @app.route("/activities", methods=["POST", "GET"])
 def activities():
+    # Prevent access if user is not logged in
+    if (session.get("name") is None):
+        flash("Please login first")
+        return redirect(url_for("home"))
+
     if request.method == "GET":
         return render_template("/activities.html")
-    
-    # Access user information from session
+        
     name = session.get("name")
     dob = session.get("dob")
-    
-    if name is None or dob is None:
-        # Handle the case where session data is missing
-        return redirect(url_for("login"))
     
     activity = {
         "activityType": request.form.get("Activity"),
@@ -94,20 +105,20 @@ def activities():
     # Insert the activity into the activities sub-document of the user's record
     users.update_one({"name": name, "dateOfBirth": dob}, {"$push": {"activities": activity}},)
 
-    return render_template("/dashboard.html", name=name)
+    return redirect(url_for("dashboard"))
 
 @app.route("/weight", methods=["POST", "GET"])
 def weight():
+    # Prevent access if user is not logged in
+    if (session.get("name") is None):
+        flash("Please login first")
+        return redirect(url_for("home"))
+
     if request.method == "GET":
         return render_template("/weight.html")
-    
-    # Access user information from session
+        
     name = session.get("name")
     dob = session.get("dob")
-    
-    if name is None or dob is None:
-        # Handle the case where session data is missing
-        return redirect(url_for("login"))
     
     weightReport = {
         "weight": request.form.get("Weight"),
@@ -116,20 +127,21 @@ def weight():
 
     users.update_one({"name": name, "dateOfBirth": dob}, {"$push": {"weightReports": weightReport}, })
 
-    return render_template("/dashboard.html", name=name)
+    return redirect(url_for("dashboard"))
 
 @app.route("/sleep", methods=["POST", "GET"])
 def sleep():
+
+    # Prevent access if user is not logged in
+    if (session.get("name") is None):
+        flash("Please login first")
+        return redirect(url_for("home"))
+    
     if request.method == "GET":
         return render_template("/sleep.html")
     
-    # Access user information from session
     name = session.get("name")
     dob = session.get("dob")
-    
-    if name is None or dob is None:
-        # Handle the case where session data is missing
-        return redirect(url_for("login"))
     
     sleepReport = {
         "timeSleptHr": request.form.get("TimeSleptHr"),
@@ -139,27 +151,22 @@ def sleep():
 
     users.update_one({"name": name, "dateOfBirth": dob}, {"$push": {"sleepReport": sleepReport}},)
 
-    return render_template("/dashboard.html", name=name)
+    return redirect(url_for("dashboard"))
 
 @app.route("/dashboard", methods=["POST", "GET"])
 def dashboard():   
     # In this code snippet, `name` and `dob` are variables that are used to retrieve the values
     # entered by the user in the login form.
-    name = request.form.get("Name")
-    dob = request.form.get("Date of Birth")
+    if (session.get("name") is None):
+        flash("Please login first")
+        return redirect(url_for("home"))
+    
+    name = session.get("name")
+    dob = session.get("dob")
     currentUser = users.find_one({"name": name, "dateOfBirth": dob})
-    
-    if not currentUser:
-        flash("Invalid username and date of birth. Please sign up")
-        # If the user is not logged in, redirect to the login page
-        return redirect(url_for("signup"))
 
-    # Set user information in session
-    session["name"] = name
-    session["dob"] = dob
-    
     #Recent Activity Pipeline
-    pipeline = [{'$match': {'name': name}},
+    pipeline = [{'$match': {'name': name }},
                 {'$unwind': '$activities'},
                 {'$sort': {'activities.activityDate': -1}},
                 {'$limit': 1},

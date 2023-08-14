@@ -168,8 +168,6 @@ def dashboard():
     #Recent Activity Pipeline
     pipeline = [{'$match': {'name': name }},
                 {'$unwind': '$activities'},
-                {'$sort': {'activities.activityDate': -1}},
-                {'$limit': 1},
                 {'$project': {
                     'activityType': '$activities.activityType',
                     'activityDate': '$activities.activityDate',
@@ -183,9 +181,10 @@ def dashboard():
                     {'$dateFromString': {'dateString': {'$concat': ['$activities.activityDate','T','$activities.startTime']},
                             'format': '%Y-%m-%dT%H:%M'}}]},
             'else': 0
-                }       
-        }
-    }}]
+                    }
+                }}},
+                {'$sort': {'activityDate': -1}},
+                {'$limit': 1}]
     result = list(users.aggregate(pipeline))
     whole_duration=""
     
@@ -230,6 +229,7 @@ def dashboard():
     # Set the 'weightDate' column as the index
     weight_df.set_index('weightDate', inplace=True)
     weight_fig = px.line(weight_df, y='weight', title='Weight Progress')
+    weight_fig.update_yaxes(categoryorder="category ascending")
     weight_div = weight_fig.to_html(full_html=False)
 
     # Extract activities data

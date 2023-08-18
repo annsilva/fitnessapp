@@ -23,18 +23,20 @@
                 {% block title %}
                 <span class="splash-description">Please enter your user information.</span>
                 {% endblock %}    
-                   </div>
+            </div>
             <div class="card-body">
                 {% block main %}
                 <form action="/login" method="post">
-                    <div class="form-group">
-                        <input class="form-control form-control-lg" id="name" type="text" placeholder="Name" autocomplete="off">
-                    </div>
-                    <div class="form-group">
-                        <label>Date Of Birth</label>
-                        <input class="form-control date-inputmask"  autocomplete="off" autofocus name="Date of Birth" id="dateOfBirth" type="date" required>
-                    </div>
-                    <div class="form-group color:red">
+                
+                        <div class="form-group">
+                            <label for="inputText3" class="col-form-label">Name</label>
+                            <input autocomplete="off" autofocus name="Name" id="name" type="text" required class="form-control">                
+                        </div>
+                        <div class="form-group">
+                            <label>Date Of Birth</label>
+                            <input class="form-control date-inputmask"  autocomplete="off" autofocus name="Date of Birth" id="dateOfBirth" type="date" required>
+                        </div>
+                        <div class="form-group">
                         {% with messages = get_flashed_messages() %}
                             {% if messages %}
                             {% for message in messages %}
@@ -43,7 +45,11 @@
                             {% endif %}
                         {% endwith %}
                         </div>
-                    <button type="submit" class="btn btn-primary btn-lg btn-block">Sign in</button>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">Login</button>
+                        </div>
+                        <div class="form-group">
+                            No account yet?  <a href="{{ url_for('signup') }}">Sign Up</a>                        
                 </form>
                 {% endblock %}
             </div>
@@ -54,9 +60,7 @@
             
         </div>
     </div>
-    
-    <div id="footer-placeholder">
-    </div>
+    <div id="footer-placeholder"></div>
 
     <script>
         // Function to load and insert the HTML content
@@ -80,6 +84,6 @@
         loadHTML('{{ url_for("static", filename="header.html") }}', 'header-placeholder');
         loadHTML('{{ url_for("static", filename="footer.html") }}', 'footer-placeholder');
     </script>
-</div>    
+    </div>    
 </body>
 </html>

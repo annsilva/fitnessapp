@@ -64,28 +64,6 @@ def signup():
 
     return render_template("login.html")
 
-# @app.route("/login", methods=["GET","POST"])
-# def login():
-#     if request.method == 'POST':
-#         # Check if the session user is logged in or exists in the database
-#         # In this code snippet, `name` and `dob` are variables that are used to retrieve the values
-#         # entered by the user in the login form.
-#         name = request.form.get("Name")
-#         dob = request.form.get("Date of Birth")
-#         currentUser = users.find_one({"name": name, "dateOfBirth": dob})
-#         print("Current user:", currentUser)
-#         if not currentUser:
-#             flash("Invalid username and date of birth. Please sign up"  + str(currentUser) +"tests")
-#             # If the user is not logged in, redirect to the login page
-#             return redirect(url_for("home"))
-#         else:
-#             # Set user information in session
-#             session["name"] = name
-#             session["dob"] = dob
-#             print("Session data:", session)
-#             return redirect(url_for("dashboard"))
-#     else:    
-#         return render_template('login.html')   
 
 @app.route("/login", methods=["POST", "GET"])
 def login():
@@ -233,24 +211,65 @@ def dashboard():
         recentActivity =("No activity.")  
     
     #Sleep Pipeline
-    # Extract sleep report data
-    sleep_report = currentUser.get('sleepReport', [])
-    # Add columns to the DataFrame
-    weekly_sleep_data = {}
-    weekly_sleep_data['week'] = []         # Empty list for week numbers
-    weekly_sleep_data['timeSleptHr'] = []  # Empty list for average time slept (hours)
-    # Create a pandas DataFrame from the sleep report data
-    df = pd.DataFrame(sleep_report, columns= ['timeSleptHr','timeSleptMin','sleepDate'])
-    # Convert the 'sleepDate' column to datetime type
-    df['sleepDate'] = pd.to_datetime(df['sleepDate'])
-    # Group sleep data by week and calculate average time slept
-    df['week'] = df['sleepDate'].dt.to_period('W')
-    weekly_sleep_data = df.groupby('week').agg({'timeSleptHr': 'mean', 'timeSleptMin': 'mean'}).reset_index()
-    # Convert the 'week' column to a string representation
-    weekly_sleep_data['week'] = weekly_sleep_data['week'].astype(str)
-    # Create the weekly sleep graph using Plotly
-    fig = px.bar(weekly_sleep_data, x="week", y="timeSleptHr", labels={'week': 'Week', 'timeSleptHr': 'Average Time Slept (hours)'}, title='Weekly Sleep Graph')
-    graph_div = fig.to_html(full_html=False)
+    # # Extract sleep report data
+    sleep_reports = currentUser.get('sleepReport', [])
+    # # Add columns to the DataFrame
+    # weekly_sleep_data = {}
+    # weekly_sleep_data['week'] = []         # Empty list for week numbers
+    # weekly_sleep_data['timeSleptHr'] = []  # Empty list for average time slept (hours)
+    # # Create a pandas DataFrame from the sleep report data
+    # df = pd.DataFrame(sleep_report, columns= ['timeSleptHr','timeSleptMin','sleepDate'])
+    # # Convert the 'sleepDate' column to datetime type
+    # df['sleepDate'] = pd.to_datetime(df['sleepDate'])
+    # # Group sleep data by week and calculate average time slept
+    # df['week'] = df['sleepDate'].dt.to_period('W')
+    # weekly_sleep_data = df.groupby('week').agg({'timeSleptHr': 'mean', 'timeSleptMin': 'mean'}).reset_index()
+    # # Convert the 'week' column to a string representation
+    # weekly_sleep_data['week'] = weekly_sleep_data['week'].astype(str)
+    # # Create the weekly sleep graph using Plotly
+    # fig = px.bar(weekly_sleep_data, x="week", y="timeSleptHr", labels={'week': 'Week', 'timeSleptHr': 'Average Time Slept (hours)'}, title='Weekly Sleep Graph')
+    # graph_div = fig.to_html(full_html=False)
+
+## SLEEP
+    # Get the 'sleepReport' list from the currentUser dictionary
+    sleep_reports = currentUser.get('sleepReport', [])
+
+    # Convert sleep time to total minutes and create a DataFrame
+    data = []
+    for report in sleep_reports:
+        time_slept_hr = int(report['timeSleptHr'])
+        time_slept_min = int(report['timeSleptMin'])
+        total_sleep_min = time_slept_hr * 60 + time_slept_min
+        data.append({'sleepDate': report['sleepDate'], 'total_sleep_min': total_sleep_min})
+
+    df_sleep = pd.DataFrame(data)
+
+    # Convert sleepDate to datetime type
+    df_sleep['sleepDate'] = pd.to_datetime(df_sleep['sleepDate'])
+    # Group data by week and calculate average sleep in hours
+    df_sleep['week'] = df_sleep['sleepDate'].dt.to_period('W')
+    df_grouped = df_sleep.groupby('week').mean().reset_index()
+    df_grouped['avg_sleep_hr'] = df_grouped['total_sleep_min'] / 60
+
+    # Convert 'week' to string representation with 'yy-mm-dd' format
+    def format_week(period):
+        start = period.start_time.strftime('%y-%m-%d')
+        end = (period.end_time - pd.Timedelta(days=1)).strftime('%y-%m-%d')
+        return f"{start} - {end}"
+
+    df_grouped['week_str'] = df_grouped['week'].apply(format_week)
+
+    # Create the average sleep graph using Plotly
+    fig = px.bar(df_grouped, x='week_str', y='avg_sleep_hr',
+                labels={'week_str': 'Week', 'avg_sleep_hr': 'Average Sleep Hours'},
+                title='Average Sleep Hours Per Week')
+
+    # Rotate x-axis tick labels
+    fig.update_xaxes(tickangle=270)
+
+    graph_div_avg_sleep = fig.to_html(full_html=False)
+## SLEEP
+
 
     # Extract data from the cursor
     user_weights = currentUser.get('weightReports', [])
@@ -264,20 +283,35 @@ def dashboard():
     weight_fig.update_yaxes(categoryorder="category ascending")
     weight_div = weight_fig.to_html(full_html=False)
 
-    # Extract activities data
+    # Get the 'activities' list from the currentUser dictionary
     all_activities = currentUser.get('activities', [])
-    # Create a pandas DataFrame from the activities data
-    df = pd.DataFrame(all_activities, columns=['activityType', 'activityDate'])
-
+#<<< ACTIVITIES >>
+    # Convert activities list to a DataFrame
+    df_activities = pd.DataFrame(all_activities, columns=['activityType', 'activityDate', 'startTime', 'endTime'])
     # Convert activityDate to datetime type
-    df['activityDate'] = pd.to_datetime(df['activityDate'])
-    df.set_index('activityDate', inplace=True)
+    df_activities['activityDate'] = pd.to_datetime(df_activities['activityDate'])
+    # Convert startTime and endTime to datetime type
+    df_activities['startTime'] = pd.to_datetime(df_activities['startTime'])
+    df_activities['endTime'] = pd.to_datetime(df_activities['endTime'])
+    # Calculate activity duration in minutes
+    df_activities['duration_minutes'] = (df_activities['endTime'] - df_activities['startTime']).dt.total_seconds() / 60
+
+    # Format activityDate as 'yy-mm-dd' strings
+    df_activities['activityDate'] = df_activities['activityDate'].dt.strftime('%y-%m-%d')
     # Create the activity graph using Plotly
-    fig = px.bar(df, y='activityType', orientation='h', labels={'activityDate': 'Activity Date', 'activityType': 'Activity Type'}, title='Activity Graph')
-    graph_div_activities = fig.to_html(full_html=False)
+    fig_activities = px.bar(df_activities, x='activityDate', y='duration_minutes', color='activityType',
+                 labels={'activityDate': 'Activity Date', 'duration_minutes': 'Duration (minutes)',
+                         'activityType': 'Activity Type'},
+                 title='Activity Duration Per Day')
+    # Set x-axis category order and labels to display vertically
+    # Set custom tick labels for x-axis
+    fig_activities.update_xaxes(tickvals=df_activities['activityDate'], ticktext=df_activities['activityDate'], tickangle=270)
+#<<< ACTIVITIES >>
+    
+    graph_div_activities = fig_activities.to_html(full_html=False)
 
     # If the user is logged in, render the dashboard page and pass the username as a parameter
-    return render_template("/dashboard.html", name=name, recentActivity=recentActivity, whole_duration=whole_duration,graph_div=graph_div\
+    return render_template("/dashboard.html", name=name, recentActivity=recentActivity, whole_duration=whole_duration,graph_div_avg_sleep=graph_div_avg_sleep \
                             ,weight_div=weight_div, graph_div_activities=graph_div_activities) 
     # In this code, `username` is a variable that is used to
     # store the name of the user who is currently logged in.

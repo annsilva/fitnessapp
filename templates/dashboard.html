@@ -109,8 +109,8 @@
                                     <h5 class="card-header">Sleep</h5>
                                     <div class="card-body">
                                         <div class="metric-value d-inline-block">
-                                            {% if graph_div %}
-                                                <div id="graph-div">{{ graph_div | safe }}</div>
+                                            {% if graph_div_avg_sleep %}
+                                                <div id="graph-div">{{ graph_div_avg_sleep  | safe }}</div>
                                             {% else %}
                                                 <p>No sleep report data available.</p>
                                             {% endif %}

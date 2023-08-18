@@ -14,74 +14,71 @@
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/inputmask/css/inputmask.css') }}" />
 </head>
 <body>
+    <div class="dashboard-main-wrapper">
     <!-- Placeholders for the header and footer content -->
-    <div id="header-placeholder"></div>
-
-    <!-- Main content of the inner page -->
-    <div id="content" class="dashboard-wrapper">
-        <div class="row">
-            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                <div class="page-header" id="top">
-                    <h2 class="pageheader-title">Fitness App</h2>
-                </div>
-            </div>
-        </div>        
-        <div class="row">
-            <div class="card">
+    <div id="header-placeholder" class="dashboard-header"></div>
+    <div class="splash-container">
+        <div class="card ">
+            <div class="card-header text-center">
                 {% block title %}
-                <h5 class="card-header">Login</h5>
-                {% endblock %}                
-                <div class="card-body">
-                    {% block main %}
-                    <form action="/login" method="post">
-                    
-                            <div class="form-group">
-                                <label for="inputText3" class="col-form-label">Name</label>
-                                <input autocomplete="off" autofocus name="Name" id="name" type="text" required class="form-control">                
-                            </div>
-                            <div class="form-group">
-                                <label>Date Of Birth</label>
-                                <input class="form-control date-inputmask"  autocomplete="off" autofocus name="Date of Birth" id="dateOfBirth" type="date" required>
-                            </div>
-                            <div class="form-group">
-                            {% with messages = get_flashed_messages() %}
-                                {% if messages %}
-                                {% for message in messages %}
-                                    <p>{{ message }}<p>
-                                {% endfor %}
-                                {% endif %}
-                            {% endwith %}
-                            </div>
-                            <div class="form-group">
-                                <button type="submit" class="btn btn-primary">Login</button>
-                            </div>
-                            <div class="form-group">
-                                No account yet?  <a href="{{ url_for('signup') }}">Sign Up</a>                        
-                    </form>
-                    {% endblock %}
-                </div>
+                <span class="splash-description">Please enter your user information.</span>
+                {% endblock %}    
+                   </div>
+            <div class="card-body">
+                {% block main %}
+                <form action="/login" method="post">
+                    <div class="form-group">
+                        <input class="form-control form-control-lg" id="name" type="text" placeholder="Name" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label>Date Of Birth</label>
+                        <input class="form-control date-inputmask"  autocomplete="off" autofocus name="Date of Birth" id="dateOfBirth" type="date" required>
+                    </div>
+                    <div class="form-group color:red">
+                        {% with messages = get_flashed_messages() %}
+                            {% if messages %}
+                            {% for message in messages %}
+                                <p>{{ message }}<p>
+                            {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+                        </div>
+                    <button type="submit" class="btn btn-primary btn-lg btn-block">Sign in</button>
+                </form>
             </div>
+            <div class="card-footer bg-white p-0  ">
+                <div class="card-footer-item card-footer-item-bordered">
+                    No account yet?  <a href="{{ url_for('signup') }}">Sign Up</a></div>                
+            </div>
+            {% endblock %}
+        </div>
     </div>
+    
+    <div id="footer-placeholder">
     </div>
-
-    <div id="footer-placeholder"></div>
 
     <script>
         // Function to load and insert the HTML content
         function loadHTML(url, targetId) {
+            console.log("Loading HTML from:", url);
             var xhr = new XMLHttpRequest();
             xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    document.getElementById(targetId).innerHTML = xhr.responseText;
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        console.log("Received response:", xhr.responseText);
+                        document.getElementById(targetId).innerHTML = xhr.responseText;
+                    } else {
+                        console.error("Failed to load:", xhr.status);
+                    }
                 }
             };
             xhr.open('GET', url, true);
             xhr.send();
         }
-
         // Call the function to load and insert the header and footer
-        loadHTML('header.html', 'header-placeholder');
-        loadHTML('footer.html', 'footer-placeholder');
+        loadHTML('{{ url_for("static", filename="header.html") }}', 'header-placeholder');
+        loadHTML('{{ url_for("static", filename="footer.html") }}', 'footer-placeholder');
     </script>
+</div>    
 </body>
 </html>

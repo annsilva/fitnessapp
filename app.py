@@ -64,29 +64,47 @@ def signup():
 
     return render_template("login.html")
 
-@app.route("/login", methods=["GET","POST"])
-def login():
-    if request.method == 'POST':
-        # Check if the session user is logged in or exists in the database
-        # In this code snippet, `name` and `dob` are variables that are used to retrieve the values
-        # entered by the user in the login form.
-        name = request.form.get("Name")
-        dob = request.form.get("Date of Birth")
-        currentUser = users.find_one({"name": name, "dateOfBirth": dob})
-        print("Current user:", currentUser)
-        if not currentUser:
-            flash("Invalid username and date of birth. Please sign up"  + str(currentUser) +"tests")
-            # If the user is not logged in, redirect to the login page
-            return redirect(url_for("home"))
-        else:
-            # Set user information in session
-            session["name"] = name
-            session["dob"] = dob
-            print("Session data:", session)
-            return redirect(url_for("dashboard"))
-    else:    
-        return render_template('login.html')   
+# @app.route("/login", methods=["GET","POST"])
+# def login():
+#     if request.method == 'POST':
+#         # Check if the session user is logged in or exists in the database
+#         # In this code snippet, `name` and `dob` are variables that are used to retrieve the values
+#         # entered by the user in the login form.
+#         name = request.form.get("Name")
+#         dob = request.form.get("Date of Birth")
+#         currentUser = users.find_one({"name": name, "dateOfBirth": dob})
+#         print("Current user:", currentUser)
+#         if not currentUser:
+#             flash("Invalid username and date of birth. Please sign up"  + str(currentUser) +"tests")
+#             # If the user is not logged in, redirect to the login page
+#             return redirect(url_for("home"))
+#         else:
+#             # Set user information in session
+#             session["name"] = name
+#             session["dob"] = dob
+#             print("Session data:", session)
+#             return redirect(url_for("dashboard"))
+#     else:    
+#         return render_template('login.html')   
 
+@app.route("/login", methods=["POST", "GET"])
+def login():
+    # Check if the session user is logged in or exists in the database
+    # In this code snippet, `name` and `dob` are variables that are used to retrieve the values
+    # entered by the user in the login form.
+    name = request.form.get("Name")
+    dob = request.form.get("Date of Birth")
+    currentUser = users.find_one({"name": name, "dateOfBirth": dob})
+    if not currentUser:
+        flash("Invalid username and date of birth. Please sign up")
+        # If the user is not logged in, redirect to the login page
+        return redirect(url_for("home"))
+    else:
+        # Set user information in session
+        session["name"] = name
+        session["dob"] = dob
+        return redirect(url_for("dashboard"))
+    
 @app.route("/logout", methods=["POST", "GET"])
 def logout():
     # Check if the session user is logged in or exists in the database

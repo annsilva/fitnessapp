@@ -39,6 +39,7 @@
                                     <li class="breadcrumb-item active" aria-current="page" ><a href="#" class="breadcrumb-link">Log Activity</a></li>
                                     <li class="breadcrumb-item active" aria-current="page" ><a href="{{ url_for('weight') }}" class="breadcrumb-link">Log Weight</a></li>
                                     <li class="breadcrumb-item active" aria-current="page" ><a href="{{ url_for('sleep') }}" class="breadcrumb-link">Log Sleep</a></li>  
+                                    <li class="breadcrumb-item active" aria-current="page" ><a href="{{ url_for('logout') }}" class="breadcrumb-link">Logout</a></li>
                                 </ol>
                             </nav>  
                     </div> 
@@ -46,7 +47,7 @@
                 {% endblock %}               
                 <div class="card-body">
                     {% block main %}
-                    <form action="/dashboard" method="post">                    
+                    <form action="/activities" method="post">                    
                             <div class="form-group">
                                 <label for="inputText3" class="col-form-label">Activity</label>
                                     <select name="Activity" id="sex" class="col-form-label">

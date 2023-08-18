@@ -164,7 +164,21 @@ body {
     background-color: #efeff6;
     -webkit-font-smoothing: antialiased;
 }
-
+body:before {
+	content: '';
+	position: fixed;
+	width: 100vw;
+	height: 100vh;
+	background-image: url(../../images/2.jpg);
+	background-position: center center;
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	-webkit-background-size: cover;
+	background-size: cover;
+	-webkit-filter: blur(10px);
+	-moz-filter: blur(10px);
+	filter: blur(10px);
+}
 h1,
 h2,
 h3,
@@ -1239,7 +1253,10 @@ Legends
 Top Header
 -------------------------*/
 
-.dashboard-header {}
+.dashboard-header {
+    padding-left: 100px;;
+    
+}
 
 .dashboard-header .navbar {
     padding: 0px;
@@ -1961,10 +1978,13 @@ Container / Wrapper
 }
 
 .dashboard-wrapper {
-    position: relative;
-    left: 0;
-    margin-left: 264px;
-    min-height: 870px !important;
+    position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 400px;
+	height: 350px;
+	padding: 80px 40px;
 }
 
 .dashboard-content {
@@ -3228,6 +3248,7 @@ btn-link
     -webkit-box-shadow: 0px 1px 2px 1px rgba(154, 154, 204, 0.22);
     -moz-box-shadow: 0px 1px 2px 1px rgba(154, 154, 204, 0.22);
     box-shadow: 0px 1px 2px 1px rgba(154, 154, 204, 0.22);
+    width:550px;
 }
 
 .card-header {

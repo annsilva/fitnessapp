@@ -98,13 +98,13 @@ def activities():
     if (session.get("name") is None):
         flash("Please login first")
         return redirect(url_for("home"))
+    else:
+        name = session.get("name")
+        dob = session.get("dob")
 
     if request.method == "GET":
         return render_template("/activities.html")
         
-    name = session.get("name")
-    dob = session.get("dob")
-    
     activity = {
         "activityType": request.form.get("Activity"),
         "activityDate": request.form.get("Date"),

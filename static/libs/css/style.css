@@ -1982,7 +1982,7 @@ Container / Wrapper
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
-	width: 700px;
+	width: 900px;
 	height: 350px;
 	padding: 80px 40px;
 }
@@ -1998,7 +1998,7 @@ Splash Container / Wrapper
 
 .splash-container {
     width: 100%;
-    max-width: 900px;
+    max-width: 700px;
     padding: 0px;
     margin: auto;
 }

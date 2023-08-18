@@ -12,101 +12,102 @@
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/fonts/fontawesome/css/fontawesome-all.css') }}">
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/datepicker/tempusdominus-bootstrap-4.css') }}" />
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/inputmask/css/inputmask.css') }}" />
+        <!-- Include Plotly.js library -->
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
-    <!-- Placeholders for the header and footer content -->
-    <div id="header-placeholder"></div>
-
-    <!-- Main content of the inner page -->
-    <div id="content" class="dashboard-wrapper">
-        <div class="row">
-            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                <div class="page-header" id="top">
-                    <h2 class="pageheader-title">Fitness App</h2>
-                </div>
-            </div>
-        </div>        
-        <div class="row">
+    <div class="dashboard-main-wrapper">
+        <!-- Placeholders for the header and footer content -->
+        <div id="header-placeholder" class="dashboard-header"></div>
+        <div class="splash-container">
             <div class="card">
-                {% block title %}
-                <div><h5 class="card-header">Activities</h5></div>
-                <div><h5 class="card-header">{{ name }}</h5></div>
-                <div class="page-breadcrumb">
-                        <div>
-                            <nav aria-label="breadcrumb">
-                                <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" class="breadcrumb-link">Dashboard</a></li>                            
-                                    <li class="breadcrumb-item active" aria-current="page" ><a href="#" class="breadcrumb-link">Log Activity</a></li>
-                                    <li class="breadcrumb-item active" aria-current="page" ><a href="{{ url_for('weight') }}" class="breadcrumb-link">Log Weight</a></li>
-                                    <li class="breadcrumb-item active" aria-current="page" ><a href="{{ url_for('sleep') }}" class="breadcrumb-link">Log Sleep</a></li>  
-                                    <li class="breadcrumb-item active" aria-current="page" ><a href="{{ url_for('logout') }}" class="breadcrumb-link">Logout</a></li>
-                                </ol>
-                            </nav>  
-                    </div> 
-                </div>         
-                {% endblock %}               
+                <div class="card-header">
+                    {% block title %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="card-header">Activities</h5>
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <h5 class="card-header">Hello {{ name }}!</h5>
+                        </div>
+                    </div>
+                    <div class="page-breadcrumb">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item active" aria-current="page" ><a href="{{ url_for('dashboard') }}" class="breadcrumb-link">Dashboard</a></li>                           
+                                <li class="breadcrumb-item active" aria-current="page" ><a href="{{ url_for('activities') }}" class="breadcrumb-link">Log Activity</a></li>
+                                <li class="breadcrumb-item active" aria-current="page" ><a href="{{ url_for('weight') }}" class="breadcrumb-link">Log Weight</a></li>
+                                <li class="breadcrumb-item active" aria-current="page" ><a href="{{ url_for('sleep') }}" class="breadcrumb-link">Log Sleep</a></li>  
+                                <li class="breadcrumb-item active" aria-current="page" ><a href="{{ url_for('logout') }}" class="breadcrumb-link">Logout</a></li>
+                            </ol>
+                        </nav>  
+                    </div>
+                    {% endblock %} 
+                </div>
+            
                 <div class="card-body">
                     {% block main %}
                     <form action="/activities" method="post">                    
-                            <div class="form-group">
-                                <label for="inputText3" class="col-form-label">Activity</label>
-                                    <select name="Activity" id="sex" class="col-form-label">
-                                        <option value="training" class="col-form-label">Training</option>
-                                        <option value="running" class="col-form-label">Running</option>
-                                        <option value="swimming" class="col-form-label">Swimming</option>
-                                        <option value="Biking" class="col-form-label">Biking</option>
-                                    </select>                
+                        <div class="form-group">
+                            <label for="inputText3" class="col-form-label">Activity</label>
+                                <select name="Activity" id="sex" class="col-form-label">
+                                    <option value="training" class="col-form-label">Training</option>
+                                    <option value="running" class="col-form-label">Running</option>
+                                    <option value="swimming" class="col-form-label">Swimming</option>
+                                    <option value="Biking" class="col-form-label">Biking</option>
+                                </select>                
+                        </div>
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input class="form-control date-inputmask width:100px"  autocomplete="off" autofocus name="Date" id="date" type="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputText3" class="col-form-label">Start Time</label>
+                            <input autocomplete="off" autofocus name="StartTime" id="starttime" type="time" required class=".form-control-custom">
+                        </div>
+                        <div class="form-group">
+                            <label for="inputText3" class="col-form-label">End Date</label>
+                            <input autocomplete="off" autofocus name="EndTime" id="endtime" type="time" required class=".form-control-custom">
+                        </div>
+                        <div class="form-group">                               
+                            <div class="col-sm-6 pl-0">
+                                <p class="text-right">
+                                    <button type="submit" class="btn btn-space btn-primary">Log</button>
+                                    <button id="dashboard" class="btn btn-space btn-secondary">Cancel</button>
+                                </p>
                             </div>
-                            <div class="form-group">
-                                <label>Date</label>
-                                <input class="form-control date-inputmask"  autocomplete="off" autofocus name="Date" id="date" type="date" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="inputText3" class="col-form-label">Start Time</label>
-                                <input autocomplete="off" autofocus name="StartTime" id="starttime" type="time" required class=".form-control-custom">
-                            </div>
-                            <div class="form-group">
-                                <label for="inputText3" class="col-form-label">End Date</label>
-                                <input autocomplete="off" autofocus name="EndTime" id="endtime" type="time" required class=".form-control-custom">
-                            </div>
-                            <div class="form-group">                               
-                                <div class="col-sm-6 pl-0">
-                                    <p class="text-right">
-                                        <button type="submit" class="btn btn-space btn-primary">Log</button>
-                                        <button id="dashboard" class="btn btn-space btn-secondary">Cancel</button>
-                                    </p>
-                                </div>
-                            </div>
-                    </form>
-                    {% endblock %}
+                        </div>
+                </form>
                 </div>
-            </div>
-    </div>
-    </div>
-
-    <div id="footer-placeholder"></div>
+            </div><!-- END card -->
+                {% endblock %}    
+        </div><!-- END splash-container -->
+        <div id="footer-placeholder"></div>       
+    </div><!-- END dashboard-main-wrapper -->
+    
 
     <script>
         // Function to load and insert the HTML content
         function loadHTML(url, targetId) {
+            console.log("Loading HTML from:", url);
             var xhr = new XMLHttpRequest();
             xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    document.getElementById(targetId).innerHTML = xhr.responseText;
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        console.log("Received response:", xhr.responseText);
+                        document.getElementById(targetId).innerHTML = xhr.responseText;
+                    } else {
+                        console.error("Failed to load:", xhr.status);
+                    }
                 }
             };
             xhr.open('GET', url, true);
             xhr.send();
         }
-
         // Call the function to load and insert the header and footer
-        loadHTML('header.html', 'header-placeholder');
-        loadHTML('footer.html', 'footer-placeholder');
-
-        document.getElementById('home').addEventListener('click', function() {
-            window.location.href = "{{ url_for('home') }}";
-        });
+        loadHTML('{{ url_for("static", filename="header.html") }}', 'header-placeholder');
+        loadHTML('{{ url_for("static", filename="footer.html") }}', 'footer-placeholder');
     </script>
 </body>
 </html>
-
+</body>

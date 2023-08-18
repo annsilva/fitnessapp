@@ -25,7 +25,7 @@
                     {% block title %}
                     <div class="row">
                         <div class="col-md-6">
-                            <h5 class="card-header">Sleep</h5>
+                            <h5 class="card-header">Dashboard</h5>
                         </div>
                         <div class="col-md-6 text-right">
                             <h5 class="card-header">Hello {{ name }}!</h5>
@@ -34,7 +34,7 @@
                     <div class="page-breadcrumb">
                         <nav aria-label="breadcrumb">
                             <ol class="breadcrumb">
-                                <li class="breadcrumb-item active" aria-current="page" ><a href="{{ url_for('dashboard') }}" class="breadcrumb-link">Dashboard</a></li>                           
+                                <li class="breadcrumb-item"><a href="#" class="breadcrumb-link">Dashboard</a></li>                            
                                 <li class="breadcrumb-item active" aria-current="page" ><a href="{{ url_for('activities') }}" class="breadcrumb-link">Log Activity</a></li>
                                 <li class="breadcrumb-item active" aria-current="page" ><a href="{{ url_for('weight') }}" class="breadcrumb-link">Log Weight</a></li>
                                 <li class="breadcrumb-item active" aria-current="page" ><a href="{{ url_for('sleep') }}" class="breadcrumb-link">Log Sleep</a></li>  
@@ -47,25 +47,10 @@
             
                 <div class="card-body">
                     {% block main %}
-                    <form action="/sleep" method="post">
-                        <div class="form-group">
-                            <label for="inputText3" class="col-form-label">Time Slept</label>
-                            <input autocomplete="off" autofocus name="TimeSleptHr" id="timeslepthr" type="number" required class=".form-control-custom">                                 
-                            <label for="inputText3" class="col-form-label">hr</label>
-                            <input autocomplete="off" autofocus name="TimeSleptMin" id="timesleptmin" type="number" required class=".form-control-custom">
-                            <label for="inputText3" class="col-form-label">min</label>                 
-                        </div>                            
-                        <div class="form-group">
-                            <label>Date</label>
-                            <input class="form-control date-inputmask"  autocomplete="off" autofocus name="SleepDate" id="sleepDate" type="date" required>
-                        </div>
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-primary">Submit</button>
-                        </div>
-                </form>
-                {% endblock %} 
+                   
                 </div>
             </div><!-- END card -->
+                {% endblock %}    
         </div><!-- END splash-container -->
         <div id="footer-placeholder"></div>       
     </div><!-- END dashboard-main-wrapper -->

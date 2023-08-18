@@ -16,148 +16,104 @@
         <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
-    <!-- Placeholders for the header and footer content -->
-    <div id="header-placeholder"></div>
-
-    <!-- Main content of the inner page -->
-    <div id="content" class="dashboard-wrapper">
-        <div class="row">
-            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                <div class="page-header" id="top">
-                    <h2 class="pageheader-title">Fitness App</h2>
-                </div>
-            </div>
-        </div>        
-        <div class="row">
+    <div class="dashboard-main-wrapper">
+        <!-- Placeholders for the header and footer content -->
+        <div id="header-placeholder" class="dashboard-header"></div>
+        <div class="splash-container">
             <div class="card">
-                {% block title %}
-                <div><h5 class="card-header">Dashboard</h5></div>
-                <div>
-                    <h5 class="card-header">Hello {{ name }}!</h5>
+                <div class="card-header">
+                    {% block title %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="card-header">Dashboard</h5>
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <h5 class="card-header">Hello {{ name }}!</h5>
+                        </div>
+                    </div>
+                    <div class="page-breadcrumb">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item active" aria-current="page" ><a href="{{ url_for('dashboard') }}" class="breadcrumb-link">Dashboard</a></li>                          
+                                <li class="breadcrumb-item active" aria-current="page" ><a href="{{ url_for('activities') }}" class="breadcrumb-link">Log Activity</a></li>
+                                <li class="breadcrumb-item active" aria-current="page" ><a href="{{ url_for('weight') }}" class="breadcrumb-link">Log Weight</a></li>
+                                <li class="breadcrumb-item active" aria-current="page" ><a href="{{ url_for('sleep') }}" class="breadcrumb-link">Log Sleep</a></li>  
+                                <li class="breadcrumb-item active" aria-current="page" ><a href="{{ url_for('logout') }}" class="breadcrumb-link">Logout</a></li>
+                            </ol>
+                        </nav>  
+                    </div>
+                    {% endblock %} 
                 </div>
-                <div class="page-breadcrumb">
-                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                            <nav aria-label="breadcrumb">
-                                <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="#" class="breadcrumb-link">Dashboard</a></li>                            
-                                    <li class="breadcrumb-item active" aria-current="page" ><a href="{{ url_for('activities') }}" class="breadcrumb-link">Log Activity</a></li>
-                                    <li class="breadcrumb-item active" aria-current="page" ><a href="{{ url_for('weight') }}" class="breadcrumb-link">Log Weight</a></li>
-                                    <li class="breadcrumb-item active" aria-current="page" ><a href="{{ url_for('sleep') }}" class="breadcrumb-link">Log Sleep</a></li>  
-                                    <li class="breadcrumb-item active" aria-current="page" ><a href="{{ url_for('logout') }}" class="breadcrumb-link">Logout</a></li>
-                                </ol>
-                            </nav>  
-                    </div> 
-                </div>         
-                {% endblock %}       
+            
                 <div class="card-body">
                     {% block main %}
                     <form action="/dashboard" method="post">
                         <div class="row">
-                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                                <div class="card">
-                                    <h5 class="card-header">Recent Activity</h5>
-                                    <div class="card-body">
-                                        <div class="metric-value d-inline-block">
-                                            <h5 class="mb-1">{{ recentActivity }}</h5>
-                                            <img src="{{ url_for('static', filename='images/run.png') }}" />
-                                        </div>
-                                        <div class="metric-label d-inline-block float-right text-success font-weight-bold">
-                                            <span class="icon-circle-small icon-box-xs text-success bg-success-light"><i class="fa fa-fw fa-arrow-up"></i></span><span class="ml-1">{{whole_duration}}</span>
-                                        </div>
-                                        <div>
-                                            {% if graph_div_activities %}
-                                                <div id="graph_div_activities" width="100%">{{ graph_div_activities | safe }}</div>
-                                            {% else %}
-                                                <p>No activities data available.</p>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                    <div class="card-body bg-light p-t-40 p-b-40">
-                                        <div id="sparkline-revenue"></div>
-                                    </div>
-                                    <div class="card-footer text-center bg-white">
-                                       
-                                    </div>
-                                </div>
+                            <div class="col-md-6 text-right"">
+                                <h5 class="card-header">Recent Activity</h5>
+                            </div>
+                            <div class="col-md-2 text-right">
+                                <h5 class="card-header">{{ recentActivity }}</h5>
+                            </div>
+                            <div class="col-md-4 text-left">
+                                <h5 class="card-header">{{ whole_duration }}</h5>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                                <div class="card">
-                                    <h5 class="card-header">Weight</h5>
-                                    <div class="card-body">
-                                        <div class="metric-value d-inline-block">
-                                            {{ weight_div | safe }}
-                                        </div>
-                                        <div class="metric-label d-inline-block float-right text-secondary font-weight-bold">
-                                            <span class="icon-circle-small icon-box-xs text-danger bg-danger-light">
-                                                <i class="fa fa-fw fa-arrow-down"></i></span><span class="ml-1">15%</span>
-                                        </div>
-                                    </div>
-                                    <div class="card-body text-center bg-light p-t-40 p-b-40">
-                                        <div id="sparkline-revenue2"></div>
-                                    </div>
-                                    <div class="card-footer text-center bg-white">
-                                        <a href="#" class="card-link">View Details</a>
-                                    </div>
-                                </div>
+                            {% if graph_div_activities %}
+                                <div id="graph_div_activities" width="100%">{{ graph_div_activities | safe }}</div>
+                            {% else %}
+                                <p>No activities data available.</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <h5 class="card-header">Weight</h5>
+                            <div class="metric-value d-inline-block">
+                                {{ weight_div | safe }}
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                                <div class="card">
-                                    <h5 class="card-header">Sleep</h5>
-                                    <div class="card-body">
-                                        <div class="metric-value d-inline-block">
-                                            {% if graph_div_avg_sleep %}
-                                                <div id="graph-div">{{ graph_div_avg_sleep  | safe }}</div>
-                                            {% else %}
-                                                <p>No sleep report data available.</p>
-                                            {% endif %}
-                                        </div>
-                                        <div class="metric-label d-inline-block float-right text-success font-weight-bold">
-                                            <span class="icon-circle-small icon-box-xs text-success bg-success-light">
-                                                <i class="fa fa-fw fa-arrow-up"></i></span><span class="ml-1">25%</span>
-                                        </div>
-                                    </div>
-                                    <div class="card-body bg-light p-t-40 p-b-40">
-                                        <div id="sparkline-revenue3"></div>
-                                    </div>
-                                    <div class="card-footer text-center bg-white">
-                                        <a href="#" class="card-link">View Details</a>
-                                    </div>
-                                </div>
+                        <div>
+                        <div>
+                            <h5 class="card-header">Sleep</h5>
+                            <div class="metric-value d-inline-block">
+                                {% if graph_div_avg_sleep %}
+                                    <div id="graph-div">{{ graph_div_avg_sleep  | safe }}</div>
+                                {% else %}
+                                    <p>No sleep report data available.</p>
+                                {% endif %}
                             </div>
-                        </div>    
+                        </div>
                     </form>
-                    {% endblock %}
                 </div>
-            </div>
-    </div>
-    </div>
-
-    <div id="footer-placeholder"></div>
+            </div><!-- END card -->
+                {% endblock %}    
+        </div><!-- END splash-container -->
+        <div id="footer-placeholder"></div>       
+    </div><!-- END dashboard-main-wrapper -->
+    
 
     <script>
         // Function to load and insert the HTML content
         function loadHTML(url, targetId) {
+            console.log("Loading HTML from:", url);
             var xhr = new XMLHttpRequest();
             xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    document.getElementById(targetId).innerHTML = xhr.responseText;
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        console.log("Received response:", xhr.responseText);
+                        document.getElementById(targetId).innerHTML = xhr.responseText;
+                    } else {
+                        console.error("Failed to load:", xhr.status);
+                    }
                 }
             };
             xhr.open('GET', url, true);
             xhr.send();
         }
-
         // Call the function to load and insert the header and footer
-        loadHTML('header.html', 'header-placeholder');
-        loadHTML('footer.html', 'footer-placeholder');
-
-        document.getElementById('signup').addEventListener('click', function() {
-            window.location.href = "{{ url_for('signup') }}";
-        });
+        loadHTML('{{ url_for("static", filename="header.html") }}', 'header-placeholder');
+        loadHTML('{{ url_for("static", filename="footer.html") }}', 'footer-placeholder');
     </script>
 </body>
 </html>
+</body>

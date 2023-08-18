@@ -242,7 +242,7 @@ def dashboard():
         total_sleep_min = time_slept_hr * 60 + time_slept_min
         data.append({'sleepDate': report['sleepDate'], 'total_sleep_min': total_sleep_min})
 
-    df_sleep = pd.DataFrame(data)
+    df_sleep = pd.DataFrame(data, columns=['sleepDate','total_sleep_min'])
 
     # Convert sleepDate to datetime type
     df_sleep['sleepDate'] = pd.to_datetime(df_sleep['sleepDate'])
@@ -266,14 +266,11 @@ def dashboard():
 
     # Rotate x-axis tick labels
     fig.update_xaxes(tickangle=270)
-
     graph_div_avg_sleep = fig.to_html(full_html=False)
 ## SLEEP
 
-
     # Extract data from the cursor
     user_weights = currentUser.get('weightReports', [])
-    print(user_weights)
     weight_df = pd.DataFrame(user_weights, columns = ['weightDate', 'weight'])
     # Convert the 'weightDate' column to a datetime object
     weight_df['weightDate'] = pd.to_datetime(weight_df['weightDate'])

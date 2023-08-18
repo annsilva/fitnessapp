@@ -209,26 +209,6 @@ def dashboard():
         recentActivity =(f"{activity_type}")
     else:
         recentActivity =("No activity.")  
-    
-    #Sleep Pipeline
-    # # Extract sleep report data
-    sleep_reports = currentUser.get('sleepReport', [])
-    # # Add columns to the DataFrame
-    # weekly_sleep_data = {}
-    # weekly_sleep_data['week'] = []         # Empty list for week numbers
-    # weekly_sleep_data['timeSleptHr'] = []  # Empty list for average time slept (hours)
-    # # Create a pandas DataFrame from the sleep report data
-    # df = pd.DataFrame(sleep_report, columns= ['timeSleptHr','timeSleptMin','sleepDate'])
-    # # Convert the 'sleepDate' column to datetime type
-    # df['sleepDate'] = pd.to_datetime(df['sleepDate'])
-    # # Group sleep data by week and calculate average time slept
-    # df['week'] = df['sleepDate'].dt.to_period('W')
-    # weekly_sleep_data = df.groupby('week').agg({'timeSleptHr': 'mean', 'timeSleptMin': 'mean'}).reset_index()
-    # # Convert the 'week' column to a string representation
-    # weekly_sleep_data['week'] = weekly_sleep_data['week'].astype(str)
-    # # Create the weekly sleep graph using Plotly
-    # fig = px.bar(weekly_sleep_data, x="week", y="timeSleptHr", labels={'week': 'Week', 'timeSleptHr': 'Average Time Slept (hours)'}, title='Weekly Sleep Graph')
-    # graph_div = fig.to_html(full_html=False)
 
 ## SLEEP
     # Get the 'sleepReport' list from the currentUser dictionary
@@ -246,6 +226,7 @@ def dashboard():
 
     # Convert sleepDate to datetime type
     df_sleep['sleepDate'] = pd.to_datetime(df_sleep['sleepDate'])
+
     # Group data by week and calculate average sleep in hours
     df_sleep['week'] = df_sleep['sleepDate'].dt.to_period('W')
     df_grouped = df_sleep.groupby('week').mean().reset_index()
@@ -267,6 +248,7 @@ def dashboard():
     # Rotate x-axis tick labels
     fig.update_xaxes(tickangle=270)
     graph_div_avg_sleep = fig.to_html(full_html=False)
+
 ## SLEEP
 
     # Extract data from the cursor

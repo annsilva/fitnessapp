@@ -234,40 +234,49 @@ def dashboard():
     # Get the 'sleepReport' list from the currentUser dictionary
     sleep_reports = currentUser.get('sleepReport', [])
 
-    # Convert sleep time to total minutes and create a DataFrame
-    data = []
-    for report in sleep_reports:
-        time_slept_hr = int(report['timeSleptHr'])
-        time_slept_min = int(report['timeSleptMin'])
-        total_sleep_min = time_slept_hr * 60 + time_slept_min
-        data.append({'sleepDate': report['sleepDate'], 'total_sleep_min': total_sleep_min})
+    # Get the 'sleepReport' list from the currentUser dictionary
+    sleep_reports = currentUser.get('sleepReport', [])
 
-    df_sleep = pd.DataFrame(data)
+    if not sleep_reports:
+        graph_div_avg_sleep = "No sleep data available."
+    else:
 
-    # Convert sleepDate to datetime type
-    df_sleep['sleepDate'] = pd.to_datetime(df_sleep['sleepDate'])
-    # Group data by week and calculate average sleep in hours
-    df_sleep['week'] = df_sleep['sleepDate'].dt.to_period('W')
-    df_grouped = df_sleep.groupby('week').mean().reset_index()
-    df_grouped['avg_sleep_hr'] = df_grouped['total_sleep_min'] / 60
+        # Convert sleep time to total minutes and create a DataFrame
+        data = []
+        for report in sleep_reports:
+            time_slept_hr = int(report['timeSleptHr'])
+            time_slept_min = int(report['timeSleptMin'])
+            total_sleep_min = time_slept_hr * 60 + time_slept_min
+            data.append({'sleepDate': report['sleepDate'], 'total_sleep_min': total_sleep_min})
 
-    # Convert 'week' to string representation with 'yy-mm-dd' format
-    def format_week(period):
-        start = period.start_time.strftime('%y-%m-%d')
-        end = (period.end_time - pd.Timedelta(days=1)).strftime('%y-%m-%d')
-        return f"{start} - {end}"
+        df_sleep = pd.DataFrame(data)
 
-    df_grouped['week_str'] = df_grouped['week'].apply(format_week)
+        # Convert sleepDate to datetime type
+        df_sleep['sleepDate'] = pd.to_datetime(df_sleep['sleepDate'])
 
-    # Create the average sleep graph using Plotly
-    fig = px.bar(df_grouped, x='week_str', y='avg_sleep_hr',
-                labels={'week_str': 'Week', 'avg_sleep_hr': 'Average Sleep Hours'},
-                title='Average Sleep Hours Per Week')
+        # Group data by week and calculate average sleep in hours
+        df_sleep['week'] = df_sleep['sleepDate'].dt.to_period('W')
+        df_grouped = df_sleep.groupby('week').mean().reset_index()
+        df_grouped['avg_sleep_hr'] = df_grouped['total_sleep_min'] / 60
 
-    # Rotate x-axis tick labels
-    fig.update_xaxes(tickangle=270)
+        # Convert 'week' to string representation with 'yy-mm-dd' format
+        def format_week(period):
+            start = period.start_time.strftime('%y-%m-%d')
+            end = (period.end_time - pd.Timedelta(days=1)).strftime('%y-%m-%d')
+            return f"{start} - {end}"
 
-    graph_div_avg_sleep = fig.to_html(full_html=False)
+        df_grouped['week_str'] = df_grouped['week'].apply(format_week)
+
+        # Create the average sleep graph using Plotly
+        fig = px.bar(df_grouped, x='week_str', y='avg_sleep_hr',
+                    labels={'week_str': 'Week', 'avg_sleep_hr': 'Average Sleep Hours'},
+                    title='Average Sleep Hours Per Week')
+
+        # Rotate x-axis tick labels
+        fig.update_xaxes(tickangle=270)
+
+        graph_div_avg_sleep = fig.to_html(full_html=False)
+
 ## SLEEP
 
 

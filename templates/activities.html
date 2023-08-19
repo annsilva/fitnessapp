@@ -27,9 +27,6 @@
                         <div class="col-md-6">
                             <h5 class="card-header">Activities</h5>
                         </div>
-                        <div class="col-md-6 text-right">
-                            <h5 class="card-header">Hello {{ name }}!</h5>
-                        </div>
                     </div>
                     <div class="page-breadcrumb">
                         <nav aria-label="breadcrumb">
@@ -73,7 +70,7 @@
                             <div class="col-sm-6 pl-0">
                                 <p class="text-right">
                                     <button type="submit" class="btn btn-space btn-primary">Log</button>
-                                    <button id="dashboard" class="btn btn-space btn-secondary">Cancel</button>
+                                    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Cancel</a>
                                 </p>
                             </div>
                         </div>

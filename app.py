@@ -257,8 +257,9 @@ def dashboard():
     # Convert the 'weightDate' column to a datetime object
     weight_df['weightDate'] = pd.to_datetime(weight_df['weightDate'])
     # Set the 'weightDate' column as the index
-    weight_df.set_index('weightDate', inplace=True)
-    weight_fig = px.line(weight_df, y='weight', title='Weight Progress')
+    sorted_df = weight_df.sort_values(by=['weightDate'], ascending=[True])
+    weight_fig = px.line(sorted_df, x='weightDate', y='weight', markers=True, title='Weight Progress')
+    weight_fig.update_xaxes(range=[sorted_df['weightDate'].min(), sorted_df['weightDate'].max()])
     weight_fig.update_yaxes(categoryorder="category ascending")
     weight_div = weight_fig.to_html(full_html=False)
 
